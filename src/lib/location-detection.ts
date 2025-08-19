@@ -178,15 +178,27 @@ export async function validateLocation(city: string, region: string, country: st
   suggestions?: string[]
 }> {
   try {
+    // Check if API key is available
+    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+    if (!apiKey) {
+      console.log('Google Maps API key not available for validation')
+      // Return valid by default if no API key (development mode)
+      return { isValid: true }
+    }
+
     const address = `${city}, ${region}, ${country}`
+    console.log('Validating location:', address)
+    
     const response = await fetch(
-      `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`
+      `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`
     )
     
     const data = await response.json()
+    console.log('Geocoding response:', data.status, data.results?.length || 0, 'results')
     
-    if (data.results && data.results.length > 0) {
+    if (data.status === 'OK' && data.results && data.results.length > 0) {
       const result = data.results[0]
+      console.log('Location validation successful:', result.formatted_address)
       return {
         isValid: true,
         coordinates: {
@@ -195,28 +207,42 @@ export async function validateLocation(city: string, region: string, country: st
         },
         formatted_address: result.formatted_address
       }
-    } else {
-      // Try to get suggestions by searching for similar locations
-      const suggestions = []
+    } else if (data.status === 'ZERO_RESULTS') {
+      console.log('No results found for location, trying fallback...')
       
-      // Try just city + country
+      // Try just city + country as fallback
       const cityCountryResponse = await fetch(
-        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(`${city}, ${country}`)}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(`${city}, ${country}`)}&key=${apiKey}`
       )
       const cityCountryData = await cityCountryResponse.json()
       
-      if (cityCountryData.results && cityCountryData.results.length > 0) {
-        suggestions.push(...cityCountryData.results.slice(0, 3).map((r: any) => r.formatted_address))
+      if (cityCountryData.status === 'OK' && cityCountryData.results && cityCountryData.results.length > 0) {
+        console.log('Fallback validation successful')
+        const result = cityCountryData.results[0]
+        return {
+          isValid: true,
+          coordinates: {
+            lat: result.geometry.location.lat,
+            lng: result.geometry.location.lng
+          },
+          formatted_address: result.formatted_address
+        }
+      } else {
+        console.log('Both validation attempts failed')
+        return {
+          isValid: false,
+          suggestions: cityCountryData.results?.slice(0, 3).map((r: any) => r.formatted_address) || []
+        }
       }
-      
-      return {
-        isValid: false,
-        suggestions
-      }
+    } else {
+      console.log('Geocoding API error:', data.status, data.error_message)
+      // For API errors, don't show as invalid - might be temporary
+      return { isValid: true }
     }
   } catch (error) {
     console.error('Location validation failed:', error)
-    return { isValid: false }
+    // On network/other errors, don't block the user
+    return { isValid: true }
   }
 }
 

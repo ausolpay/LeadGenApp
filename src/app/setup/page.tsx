@@ -87,23 +87,31 @@ export default function SetupPage() {
     }
   }, [countryCode])
 
-  // Validate location when inputs change
+  // Validate location when inputs change (only validate after user stops typing for 2 seconds)
   useEffect(() => {
     const validateCurrentLocation = async () => {
-      if (city && selectedRegion && selectedCountry) {
+      if (city && selectedRegion && selectedCountry && city.length >= 2) {
         setValidationStatus('none')
         
-        const validation = await validateLocation(
-          city, 
-          selectedRegion.name, 
-          selectedCountry.name
-        )
-        
-        setValidationStatus(validation.isValid ? 'valid' : 'invalid')
+        try {
+          const validation = await validateLocation(
+            city, 
+            selectedRegion.name, 
+            selectedCountry.name
+          )
+          
+          setValidationStatus(validation.isValid ? 'valid' : 'invalid')
+        } catch (error) {
+          console.error('Validation error:', error)
+          // Don't show error state for validation failures
+          setValidationStatus('none')
+        }
+      } else {
+        setValidationStatus('none')
       }
     }
 
-    const timeoutId = setTimeout(validateCurrentLocation, 1000) // Debounce validation
+    const timeoutId = setTimeout(validateCurrentLocation, 2000) // Longer debounce: 2 seconds
     return () => clearTimeout(timeoutId)
   }, [city, selectedRegion, selectedCountry])
 
@@ -145,18 +153,23 @@ export default function SetupPage() {
         throw new Error('Please select a valid country and region')
       }
 
-      // Validate and get coordinates for the location
-      const validation = await validateLocation(city, selectedRegion.name, selectedCountry.name)
+      // Try to validate and get coordinates, but don't block if it fails
+      let coordinates: { lat: number; lng: number } | undefined
       
-      if (!validation.isValid) {
-        throw new Error('Invalid location. Please check your city name.')
+      try {
+        const validation = await validateLocation(city, selectedRegion.name, selectedCountry.name)
+        if (validation.isValid && validation.coordinates) {
+          coordinates = validation.coordinates
+        }
+      } catch (validationError) {
+        console.log('Validation failed, proceeding without coordinates:', validationError)
       }
 
       setLocation({
         country: selectedCountry.name,
         region: selectedRegion.name,
         city,
-        coordinates: validation.coordinates,
+        coordinates,
       })
 
       router.push('/app')
@@ -180,12 +193,17 @@ export default function SetupPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center p-2">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-4 w-16 h-16 rounded-full flex items-center justify-center" style={{backgroundColor: '#1a597c'}}>
-            <Globe className="w-8 h-8 text-white" />
+          <div className="flex items-center justify-center space-x-2 mb-4 cursor-pointer" onClick={() => window.location.href = '/landing'}>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{backgroundColor: '#1a597c'}}>
+              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+              </svg>
+            </div>
+            <span className="text-2xl font-bold" style={{color: '#1a597c'}}>LumaLead.io</span>
           </div>
-          <CardTitle className="text-2xl font-bold" style={{color: '#1a597c'}}>LumaLead.io</CardTitle>
+          <CardTitle className="text-2xl font-bold" style={{color: '#1a597c'}}>Set up your location</CardTitle>
           <CardDescription style={{color: '#1a597c'}}>
-            Set up your location to start finding prospects
+            Choose your location to start finding prospects
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -327,7 +345,7 @@ export default function SetupPage() {
               type="submit" 
               className="w-full text-white"
               style={{backgroundColor: '#1a597c'}}
-              disabled={isLoading || !countryCode || !regionCode || !city || validationStatus === 'invalid'}
+              disabled={isLoading || !countryCode || !regionCode || !city}
             >
               {isLoading ? (
                 <>
