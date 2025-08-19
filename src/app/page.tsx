@@ -16,8 +16,8 @@ export default function HomePage() {
         // User is authenticated, redirect to app
         router.push('/app')
       } else {
-        // User is not authenticated, show landing page
-        window.location.href = '/index.html'
+        // User is not authenticated, redirect to landing page
+        router.push('/landing')
       }
     }
     
