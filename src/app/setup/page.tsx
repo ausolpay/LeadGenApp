@@ -20,6 +20,7 @@ export default function SetupPage() {
   const [isDetecting, setIsDetecting] = useState(false)
   const [detectionStatus, setDetectionStatus] = useState<'none' | 'detecting' | 'success' | 'failed'>('none')
   const [citySuggestions, setCitySuggestions] = useState<string[]>([])
+  const [showSuggestions, setShowSuggestions] = useState(false)
   const [validationStatus, setValidationStatus] = useState<'none' | 'valid' | 'invalid'>('none')
   
   const { setLocation } = useLocationStore()
@@ -124,7 +125,15 @@ export default function SetupPage() {
     if (countryCode && value.length > 0) {
       const suggestions = searchCitiesByCountry(countryCode, value)
       setCitySuggestions(suggestions)
+      setShowSuggestions(suggestions.length > 0)
+    } else {
+      setShowSuggestions(false)
     }
+  }
+
+  const handleCitySelect = (selectedCity: string) => {
+    setCity(selectedCity)
+    setShowSuggestions(false)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -270,6 +279,13 @@ export default function SetupPage() {
                   id="city"
                   value={city}
                   onChange={(e) => handleCityChange(e.target.value)}
+                  onFocus={() => {
+                    if (citySuggestions.length > 0) setShowSuggestions(true)
+                  }}
+                  onBlur={() => {
+                    // Delay hiding suggestions to allow for clicks
+                    setTimeout(() => setShowSuggestions(false), 200)
+                  }}
                   placeholder="Enter your city"
                   className="border-gray-200 focus:border-[#1a597c]"
                   disabled={!regionCode}
@@ -277,17 +293,20 @@ export default function SetupPage() {
                 />
                 
                 {/* City Suggestions */}
-                {city.length > 0 && citySuggestions.length > 0 && (
-                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-40 overflow-y-auto">
+                {showSuggestions && citySuggestions.length > 0 && (
+                  <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-40 overflow-y-auto">
                     {citySuggestions
-                      .filter(suggestion => suggestion.toLowerCase().includes(city.toLowerCase()))
-                      .slice(0, 5)
+                      .filter(suggestion => 
+                        city.length === 0 || suggestion.toLowerCase().includes(city.toLowerCase())
+                      )
+                      .slice(0, 8)
                       .map((suggestion, index) => (
                         <button
                           key={index}
                           type="button"
-                          className="w-full px-3 py-2 text-left hover:bg-gray-100 focus:bg-gray-100"
-                          onClick={() => setCity(suggestion)}
+                          className="w-full px-3 py-2 text-left hover:bg-blue-50 focus:bg-blue-50 text-sm border-b border-gray-100 last:border-0"
+                          onMouseDown={(e) => e.preventDefault()} // Prevent blur
+                          onClick={() => handleCitySelect(suggestion)}
                         >
                           {suggestion}
                         </button>

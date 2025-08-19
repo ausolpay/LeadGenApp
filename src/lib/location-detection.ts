@@ -132,26 +132,37 @@ export async function getLocationByIP(): Promise<DetectedLocation | null> {
 
 // Auto-detect user location with multiple fallbacks
 export async function autoDetectLocation(): Promise<DetectedLocation | null> {
+  console.log('Starting auto-detection...')
+  
   try {
     // Method 1: Try browser geolocation + reverse geocoding
     try {
+      console.log('Attempting GPS location...')
       const coords = await getUserGeolocation()
+      console.log('GPS coordinates received:', coords)
+      
       const location = await reverseGeocode(coords.latitude, coords.longitude)
-      if (location) {
+      if (location && location.country && location.city) {
         console.log('Location detected via GPS:', location)
         return location
+      } else {
+        console.log('GPS reverse geocoding incomplete:', location)
       }
     } catch (error) {
       console.log('GPS location failed, trying IP-based detection:', error instanceof Error ? error.message : String(error))
     }
 
     // Method 2: Fallback to IP-based detection
+    console.log('Attempting IP-based location...')
     const ipLocation = await getLocationByIP()
-    if (ipLocation) {
+    if (ipLocation && ipLocation.country && ipLocation.city) {
       console.log('Location detected via IP:', ipLocation)
       return ipLocation
+    } else {
+      console.log('IP location incomplete:', ipLocation)
     }
 
+    console.log('All location detection methods failed or returned incomplete data')
     return null
   } catch (error) {
     console.error('All location detection methods failed:', error)

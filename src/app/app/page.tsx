@@ -58,8 +58,36 @@ export default function AppPage() {
   }, [city, region, country, router, isClient])
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut()
-    router.push('/auth')
+    try {
+      console.log('Starting logout process...')
+      
+      // Clear all stores
+      const { clearUserData } = useContactedStore.getState()
+      clearUserData()
+      
+      // Sign out from Supabase with global scope
+      const { error } = await supabase.auth.signOut({ scope: 'global' })
+      if (error) {
+        console.error('Supabase signout error:', error)
+      } else {
+        console.log('Supabase signout successful')
+      }
+      
+      // Clear all local storage
+      localStorage.clear()
+      sessionStorage.clear()
+      
+      // Small delay to ensure cleanup completes
+      setTimeout(() => {
+        // Force redirect to landing page
+        window.location.href = '/landing'
+      }, 100)
+      
+    } catch (error) {
+      console.error('Error signing out:', error)
+      // Force redirect even if there's an error
+      window.location.href = '/landing'
+    }
   }
 
   const getUserInitials = (email: string) => {

@@ -196,7 +196,7 @@ export function AuthForm({ mode = 'signin', redirectTo = '/app' }: AuthFormProps
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 p-4">
       <Card className="w-full max-w-md rounded-2xl shadow-lg bg-white/70 backdrop-blur border-blue-200">
         <CardHeader className="text-center">
-          <div className="flex items-center justify-center space-x-2 mb-4 cursor-pointer" onClick={() => window.location.href = 'https://www.lumalead.io/'}>
+          <div className="flex items-center justify-center space-x-2 mb-4 cursor-pointer" onClick={() => window.location.href = '/landing'}>
             <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{backgroundColor: '#1a597c'}}>
               <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
