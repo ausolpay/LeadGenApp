@@ -97,7 +97,7 @@ export async function reverseGeocode(lat: number, lng: number): Promise<Detected
 
     const result = data.results[0]
     const components = result.address_components
-    console.log('🔍 Address components:', components?.map(c => ({ types: c.types, long_name: c.long_name, short_name: c.short_name })))
+    console.log('🔍 Address components:', components?.map((c: any) => ({ types: c.types, long_name: c.long_name, short_name: c.short_name })))
 
     let country = ''
     let countryCode = ''
