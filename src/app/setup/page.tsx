@@ -29,7 +29,7 @@ export default function SetupPage() {
       const response = await fetch(geocodeUrl)
       const data = await response.json()
       
-      let coordinates = null
+      let coordinates: { lat: number; lng: number; } | undefined = undefined
       if (data.results && data.results[0]) {
         const location = data.results[0].geometry.location
         coordinates = { lat: location.lat, lng: location.lng }
