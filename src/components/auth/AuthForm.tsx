@@ -46,7 +46,7 @@ export function AuthForm({ mode = 'signin', redirectTo = '/app' }: AuthFormProps
       }
     }
     testConnection()
-  }, [])
+  }, [supabase.auth])
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))

@@ -24,10 +24,23 @@ export const useContactedStore = create<ContactedState>()(
       
       setUserId: (userId) => set((state) => {
         if (state.currentUserId !== userId) {
-          // User changed, clear current data and load new user's data
+          // User changed, clear current data
+          const userKey = `contacted-store-${userId}`
+          const savedData = localStorage.getItem(userKey)
+          let userContactedMap = new Map()
+          
+          if (savedData) {
+            try {
+              const parsed = JSON.parse(savedData)
+              userContactedMap = new Map(parsed.contactedMap || [])
+            } catch (error) {
+              console.error('Error loading user contacted data:', error)
+            }
+          }
+          
           return {
             currentUserId: userId,
-            contactedMap: new Map() // Will be populated from localStorage if exists
+            contactedMap: userContactedMap
           }
         }
         return { currentUserId: userId }
@@ -40,6 +53,14 @@ export const useContactedStore = create<ContactedState>()(
           ...business,
           contact: contactState,
         })
+        
+        // Save to user-specific localStorage
+        const userKey = `contacted-store-${state.currentUserId}`
+        localStorage.setItem(userKey, JSON.stringify({
+          contactedMap: Array.from(newMap.entries()),
+          currentUserId: state.currentUserId
+        }))
+        
         return { contactedMap: newMap }
       }),
       
@@ -49,6 +70,14 @@ export const useContactedStore = create<ContactedState>()(
             if (!state.currentUserId) return state
             const newMap = new Map(state.contactedMap)
             newMap.delete(placeId)
+            
+            // Save to user-specific localStorage
+            const userKey = `contacted-store-${state.currentUserId}`
+            localStorage.setItem(userKey, JSON.stringify({
+              contactedMap: Array.from(newMap.entries()),
+              currentUserId: state.currentUserId
+            }))
+            
             return { contactedMap: newMap }
           })
         } catch (error) {
@@ -62,6 +91,13 @@ export const useContactedStore = create<ContactedState>()(
         const business = newMap.get(placeId)
         if (business) {
           newMap.set(placeId, { ...business, notes })
+          
+          // Save to user-specific localStorage
+          const userKey = `contacted-store-${state.currentUserId}`
+          localStorage.setItem(userKey, JSON.stringify({
+            contactedMap: Array.from(newMap.entries()),
+            currentUserId: state.currentUserId
+          }))
         }
         return { contactedMap: newMap }
       }),
@@ -84,7 +120,7 @@ export const useContactedStore = create<ContactedState>()(
       })),
     }),
     {
-      name: (state) => `contacted-store-${state?.currentUserId || 'anonymous'}`,
+      name: 'contacted-store',
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         contactedMap: Array.from(state.contactedMap.entries()),
