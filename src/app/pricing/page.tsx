@@ -74,11 +74,13 @@ function PricingPageContent() {
 
       const plan = pricing[planType]
       
-      if (!plan.priceId) {
+      if (!plan || !plan.priceId) {
         setMessage({ 
           type: 'error', 
-          text: `${planType} plan not available in ${currencyInfo.currency}. Using AUD pricing.` 
+          text: `Pricing configuration issue. Please contact support.` 
         })
+        console.error('Missing priceId for plan:', planType, 'currency:', currencyInfo.currency)
+        setLoading(null)
         return
       }
 
@@ -141,8 +143,13 @@ function PricingPageContent() {
       <header className="bg-white/70 backdrop-blur-md border-b border-blue-200 shadow-sm">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <h1 className="text-2xl font-bold" style={{color: '#1a597c'}}>LumaLead.io</h1>
+            <div className="flex items-center space-x-2 cursor-pointer" onClick={() => window.location.href = 'https://www.lumalead.io/'}>
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{backgroundColor: '#1a597c'}}>
+                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                </svg>
+              </div>
+              <span className="text-2xl font-bold" style={{color: '#1a597c'}}>LumaLead.io</span>
             </div>
 
             <div className="flex items-center space-x-4">

@@ -22,8 +22,9 @@ export default function AppPage() {
   const [isClient, setIsClient] = useState(false)
   const [user, setUser] = useState<any>(null)
   const { results, allResults, isLoading } = useResultsStore()
-  const { getContactedBusinesses, setUserId, isLoading: contactedLoading } = useContactedStore()
-  const contactedBusinesses = useMemo(() => getContactedBusinesses(), [getContactedBusinesses])
+  const { getContactedBusinesses, setUserId, isLoading: contactedLoading, contactedMap } = useContactedStore()
+  const contactedBusinesses = useMemo(() => getContactedBusinesses(), [getContactedBusinesses, contactedMap])
+  const contactedCount = contactedMap.size
   const { city, region, country } = useLocationStore()
   const router = useRouter()
   const supabase = createClientSupabaseClient()
@@ -163,7 +164,7 @@ export default function AppPage() {
               Results ({allResults.length})
             </TabsTrigger>
             <TabsTrigger value="contacted" className="data-[state=active]:bg-blue-100 data-[state=active]:text-blue-900">
-              Contacted ({contactedBusinesses.length})
+              Contacted ({contactedCount})
             </TabsTrigger>
           </TabsList>
 

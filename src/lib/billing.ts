@@ -2,21 +2,21 @@
 export const PRICING_CONFIG = {
   AUD: {
     monthly: {
-      priceId: process.env.STRIPE_PRICE_MONTHLY_AUD!,
+      priceId: process.env.STRIPE_PRICE_MONTHLY_AUD || process.env.NEXT_PUBLIC_STRIPE_PRICE_MONTHLY_AUD || '',
       amount: 1299, // $12.99 in cents
       currency: 'AUD',
       interval: 'month',
       trialDays: 14
     },
     yearly: {
-      priceId: process.env.STRIPE_PRICE_YEARLY_AUD!,
+      priceId: process.env.STRIPE_PRICE_YEARLY_AUD || process.env.NEXT_PUBLIC_STRIPE_PRICE_YEARLY_AUD || '',
       amount: 12499, // $124.99 in cents
       currency: 'AUD', 
       interval: 'year',
       savings: '20%'
     },
     lifetime: {
-      priceId: process.env.STRIPE_PRICE_LIFETIME_AUD!,
+      priceId: process.env.STRIPE_PRICE_LIFETIME_AUD || process.env.NEXT_PUBLIC_STRIPE_PRICE_LIFETIME_AUD || '',
       amount: 29900, // $299.00 in cents
       currency: 'AUD',
       interval: 'one-time'
@@ -24,21 +24,21 @@ export const PRICING_CONFIG = {
   },
   USD: {
     monthly: {
-      priceId: process.env.STRIPE_PRICE_MONTHLY_USD,
+      priceId: process.env.STRIPE_PRICE_MONTHLY_USD || process.env.NEXT_PUBLIC_STRIPE_PRICE_MONTHLY_USD || '',
       amount: 899, // ~$8.99 USD
       currency: 'USD',
       interval: 'month',
       trialDays: 14
     },
     yearly: {
-      priceId: process.env.STRIPE_PRICE_YEARLY_USD,
+      priceId: process.env.STRIPE_PRICE_YEARLY_USD || process.env.NEXT_PUBLIC_STRIPE_PRICE_YEARLY_USD || '',
       amount: 8599, // ~$85.99 USD
       currency: 'USD',
       interval: 'year',
       savings: '20%'
     },
     lifetime: {
-      priceId: process.env.STRIPE_PRICE_LIFETIME_USD,
+      priceId: process.env.STRIPE_PRICE_LIFETIME_USD || process.env.NEXT_PUBLIC_STRIPE_PRICE_LIFETIME_USD || '',
       amount: 20599, // ~$205.99 USD
       currency: 'USD',
       interval: 'one-time'
