@@ -23,7 +23,7 @@ export default function AppPage() {
   const [user, setUser] = useState<any>(null)
   const { results, allResults, isLoading } = useResultsStore()
   const { getContactedBusinesses, setUserId, isLoading: contactedLoading, contactedMap } = useContactedStore()
-  const contactedBusinesses = useMemo(() => getContactedBusinesses(), [getContactedBusinesses, contactedMap])
+  const contactedBusinesses = useMemo(() => getContactedBusinesses(), [getContactedBusinesses])
   const contactedCount = contactedMap.size
   const { city, region, country } = useLocationStore()
   const router = useRouter()

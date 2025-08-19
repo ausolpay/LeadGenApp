@@ -203,7 +203,7 @@ export default function SetupPage() {
             <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
               <div className="flex items-center gap-2 text-yellow-700">
                 <AlertCircle className="w-4 h-4" />
-                <span className="text-sm">Couldn't detect location. Please enter manually.</span>
+                <span className="text-sm">Could not detect location. Please enter manually.</span>
               </div>
             </div>
           )}
