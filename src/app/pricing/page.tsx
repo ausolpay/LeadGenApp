@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -12,7 +12,7 @@ import { createClientSupabaseClient } from '@/lib/supabase'
 import { PRICING_CONFIG, formatPrice } from '@/lib/billing'
 import { detectUserCountry, getCurrencyForCountry, formatCurrency, hasNativePricing, getConvertedPrice } from '@/lib/currency'
 
-export default function PricingPage() {
+function PricingPageContent() {
   const [loading, setLoading] = useState<string | null>(null)
   const [user, setUser] = useState<any>(null)
   const [profile, setProfile] = useState<any>(null)
@@ -446,5 +446,20 @@ export default function PricingPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function PricingPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-blue-700">Loading pricing...</p>
+        </div>
+      </div>
+    }>
+      <PricingPageContent />
+    </Suspense>
   )
 }

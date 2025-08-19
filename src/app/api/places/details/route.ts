@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { Business } from '@/types/business'
 import { deriveSellingPoints, formatPhoneNumber, extractSuburbFromAddress, extractPostcodeFromAddress } from '@/lib/utils'
 
+// Force dynamic rendering to avoid static generation issues
+export const dynamic = 'force-dynamic'
+
 const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY
 
 if (!GOOGLE_MAPS_API_KEY) {
