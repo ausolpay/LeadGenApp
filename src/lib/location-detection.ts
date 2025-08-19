@@ -75,18 +75,29 @@ export function getUserGeolocation(): Promise<GeolocationPosition> {
 // Reverse geocode coordinates to get location details
 export async function reverseGeocode(lat: number, lng: number): Promise<DetectedLocation | null> {
   try {
+    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+    if (!apiKey) {
+      console.log('❌ Google Maps API key not available for reverse geocoding')
+      return null
+    }
+
+    console.log(`🔍 Reverse geocoding coordinates: ${lat}, ${lng}`)
+    
     const response = await fetch(
-      `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`
+      `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`
     )
     
     const data = await response.json()
+    console.log('🔍 Geocoding API response:', data.status, data.results?.length || 0, 'results')
     
-    if (!data.results || data.results.length === 0) {
+    if (data.status !== 'OK' || !data.results || data.results.length === 0) {
+      console.log('❌ Geocoding API failed:', data.status, data.error_message)
       return null
     }
 
     const result = data.results[0]
     const components = result.address_components
+    console.log('🔍 Address components:', components?.map(c => ({ types: c.types, long_name: c.long_name, short_name: c.short_name })))
 
     let country = ''
     let countryCode = ''
@@ -101,23 +112,29 @@ export async function reverseGeocode(lat: number, lng: number): Promise<Detected
       if (types.includes('country')) {
         country = component.long_name
         countryCode = component.short_name
+        console.log('🏳️ Found country:', country, countryCode)
       }
       
       if (types.includes('administrative_area_level_1')) {
         region = component.long_name
         regionCode = component.short_name
+        console.log('🏞️ Found region:', region, regionCode)
       }
       
       if (types.includes('locality') || types.includes('administrative_area_level_2')) {
-        if (!city) city = component.long_name
+        if (!city) {
+          city = component.long_name
+          console.log('🏙️ Found city (locality):', city)
+        }
       }
       
       if (types.includes('sublocality') || types.includes('sublocality_level_1')) {
         city = component.long_name // Prefer more specific locality
+        console.log('🏘️ Found city (sublocality):', city)
       }
     }
 
-    return {
+    const result_data = {
       country,
       countryCode,
       region,
@@ -126,8 +143,35 @@ export async function reverseGeocode(lat: number, lng: number): Promise<Detected
       coordinates: { lat, lng },
       formatted_address: result.formatted_address
     }
+
+    console.log('📋 Parsed location data:', result_data)
+    
+    // Check if we have minimum required data
+    if (!country || !countryCode) {
+      console.log('❌ Missing required country data')
+      return null
+    }
+    
+    if (!city) {
+      console.log('⚠️ No city found, trying alternative address components...')
+      
+      // Try alternative approaches for city
+      for (const component of components) {
+        const types = component.types
+        
+        if (types.includes('postal_town') || 
+            types.includes('administrative_area_level_3') ||
+            types.includes('neighborhood')) {
+          city = component.long_name
+          console.log('🏙️ Found city (alternative):', city, types)
+          break
+        }
+      }
+    }
+
+    return result_data
   } catch (error) {
-    console.error('Reverse geocoding failed:', error)
+    console.error('💥 Reverse geocoding failed:', error)
     return null
   }
 }
@@ -178,13 +222,15 @@ export async function autoDetectLocation(): Promise<DetectedLocation | null> {
       console.log('🔄 Reverse geocoding coordinates...')
       const location = await reverseGeocode(coords.latitude, coords.longitude)
       
-      if (location && location.country && location.city && location.countryCode) {
+      if (location && location.country && location.countryCode) {
+        // Accept location even if city is missing - we can ask user to fill it in
         console.log('🎯 Location detected via GPS:', {
           country: location.country,
           countryCode: location.countryCode,
           region: location.region,
           city: location.city,
-          coordinates: location.coordinates
+          coordinates: location.coordinates,
+          hasCity: !!location.city
         })
         return location
       } else {

@@ -18,7 +18,7 @@ export default function SetupPage() {
   const [city, setCity] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isDetecting, setIsDetecting] = useState(false)
-  const [detectionStatus, setDetectionStatus] = useState<'none' | 'detecting' | 'success' | 'failed'>('none')
+  const [detectionStatus, setDetectionStatus] = useState<'none' | 'detecting' | 'success' | 'partial' | 'failed'>('none')
   const [citySuggestions, setCitySuggestions] = useState<string[]>([])
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [validationStatus, setValidationStatus] = useState<'none' | 'valid' | 'invalid'>('none')
@@ -48,8 +48,8 @@ export default function SetupPage() {
         if (cached.success && cached.data) {
           setCountryCode(cached.data.countryCode)
           setRegionCode(cached.data.regionCode || '')
-          setCity(cached.data.city)
-          setDetectionStatus('success')
+          setCity(cached.data.city || '')
+          setDetectionStatus(cached.partial ? 'partial' : 'success')
         } else {
           // Use cached failure result
           setCountryCode(cached.fallbackCountry || 'AU')
@@ -80,7 +80,7 @@ export default function SetupPage() {
       try {
         const detected = await autoDetectLocation()
         
-        if (detected && detected.country && detected.city) {
+        if (detected && detected.country && detected.countryCode) {
           console.log('Location detection successful:', detected)
           
           // Find matching region
@@ -100,16 +100,17 @@ export default function SetupPage() {
           // Set detected values
           setCountryCode(detected.countryCode)
           setRegionCode(regionCode)
-          setCity(detected.city)
-          setDetectionStatus('success')
+          setCity(detected.city || '') // City might be empty but that's ok
+          setDetectionStatus(detected.city ? 'success' : 'partial')
           
           // Cache successful result
           sessionStorage.setItem(SESSION_KEY, JSON.stringify({
             success: true,
+            partial: !detected.city, // Flag if city is missing
             data: {
               countryCode: detected.countryCode,
               regionCode,
-              city: detected.city
+              city: detected.city || ''
             }
           }))
           
@@ -234,7 +235,7 @@ export default function SetupPage() {
     try {
       const detected = await autoDetectLocation()
       
-      if (detected && detected.country && detected.city) {
+      if (detected && detected.country && detected.countryCode) {
         console.log('Manual retry: Location detection successful:', detected)
         
         // Find matching region
@@ -254,16 +255,17 @@ export default function SetupPage() {
         // Set detected values
         setCountryCode(detected.countryCode)
         setRegionCode(regionCode)
-        setCity(detected.city)
-        setDetectionStatus('success')
+        setCity(detected.city || '')
+        setDetectionStatus(detected.city ? 'success' : 'partial')
         
         // Cache successful result
         sessionStorage.setItem('location-detection-result', JSON.stringify({
           success: true,
+          partial: !detected.city,
           data: {
             countryCode: detected.countryCode,
             regionCode,
-            city: detected.city
+            city: detected.city || ''
           }
         }))
         
@@ -334,7 +336,7 @@ export default function SetupPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center p-2">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="flex items-center justify-center space-x-2 mb-4 cursor-pointer" onClick={() => window.location.href = '/landing'}>
+          <div className="flex items-center justify-center space-x-2 mb-4">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{backgroundColor: '#1a597c'}}>
               <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
@@ -363,6 +365,20 @@ export default function SetupPage() {
               <div className="flex items-center gap-2 text-green-700">
                 <CheckCircle className="w-4 h-4" />
                 <span className="text-sm">Location detected automatically!</span>
+              </div>
+            </div>
+          )}
+
+          {!isDetecting && detectionStatus === 'partial' && (
+            <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex items-center gap-2 text-blue-700">
+                <CheckCircle className="w-4 h-4" />
+                <div>
+                  <span className="text-sm">Country and region detected! Please enter your city.</span>
+                  <p className="text-xs mt-1 opacity-75">
+                    GPS location was successful but city could not be determined automatically.
+                  </p>
+                </div>
               </div>
             </div>
           )}
