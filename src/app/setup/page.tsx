@@ -530,15 +530,6 @@ export default function SetupPage() {
             </div>
           )}
 
-          {!isDetecting && detectionStatus === 'success' && (
-            <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-              <div className="flex items-center gap-2 text-green-700">
-                <CheckCircle className="w-4 h-4" />
-                <span className="text-sm">Location detected automatically!</span>
-              </div>
-            </div>
-          )}
-
           {!isDetecting && detectionStatus === 'partial' && (
             <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
               <div className="flex items-center gap-2 text-blue-700">
@@ -648,12 +639,6 @@ export default function SetupPage() {
               <Label htmlFor="city" style={{color: '#1a597c'}}>
                 <MapPin className="w-4 h-4 inline mr-2" />
                 City
-                {validationStatus === 'valid' && (
-                  <CheckCircle className="w-4 h-4 inline ml-2 text-green-500" />
-                )}
-                {validationStatus === 'invalid' && (
-                  <AlertCircle className="w-4 h-4 inline ml-2 text-red-500" />
-                )}
               </Label>
               <div className="relative">
                 <Input
@@ -696,12 +681,6 @@ export default function SetupPage() {
                   </div>
                 )}
               </div>
-              
-              {validationStatus === 'invalid' && (
-                <p className="text-sm text-red-500">
-                  City not found. Please check the spelling or try a nearby city.
-                </p>
-              )}
             </div>
             
             <Button 
