@@ -19,24 +19,54 @@ export interface GeolocationPosition {
 export function getUserGeolocation(): Promise<GeolocationPosition> {
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) {
+      console.log('Geolocation is not supported by this browser')
       reject(new Error('Geolocation is not supported by this browser'))
       return
     }
 
+    console.log('Requesting geolocation permission...')
+
     navigator.geolocation.getCurrentPosition(
       (position) => {
+        console.log('Geolocation success:', {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          accuracy: position.coords.accuracy
+        })
         resolve({
           latitude: position.coords.latitude,
           longitude: position.coords.longitude
         })
       },
       (error) => {
-        reject(error)
+        console.log('Geolocation error:', {
+          code: error.code,
+          message: error.message,
+          PERMISSION_DENIED: error.code === 1,
+          POSITION_UNAVAILABLE: error.code === 2,
+          TIMEOUT: error.code === 3
+        })
+        
+        // Provide more specific error messages
+        let errorMessage = error.message
+        switch (error.code) {
+          case 1:
+            errorMessage = 'Location access denied by user'
+            break
+          case 2:
+            errorMessage = 'Location information unavailable'
+            break
+          case 3:
+            errorMessage = 'Location request timed out'
+            break
+        }
+        
+        reject(new Error(errorMessage))
       },
       {
         enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 300000 // 5 minutes
+        timeout: 15000, // Increased timeout to 15 seconds
+        maximumAge: 600000 // 10 minutes cache
       }
     )
   })
@@ -132,40 +162,72 @@ export async function getLocationByIP(): Promise<DetectedLocation | null> {
 
 // Auto-detect user location with multiple fallbacks
 export async function autoDetectLocation(): Promise<DetectedLocation | null> {
-  console.log('Starting auto-detection...')
+  console.log('🌍 Starting auto-detection...')
   
   try {
     // Method 1: Try browser geolocation + reverse geocoding
     try {
-      console.log('Attempting GPS location...')
+      console.log('📍 Attempting GPS location...')
       const coords = await getUserGeolocation()
-      console.log('GPS coordinates received:', coords)
+      console.log('✅ GPS coordinates received:', coords)
       
+      if (!coords.latitude || !coords.longitude) {
+        throw new Error('Invalid coordinates received')
+      }
+      
+      console.log('🔄 Reverse geocoding coordinates...')
       const location = await reverseGeocode(coords.latitude, coords.longitude)
-      if (location && location.country && location.city) {
-        console.log('Location detected via GPS:', location)
+      
+      if (location && location.country && location.city && location.countryCode) {
+        console.log('🎯 Location detected via GPS:', {
+          country: location.country,
+          countryCode: location.countryCode,
+          region: location.region,
+          city: location.city,
+          coordinates: location.coordinates
+        })
         return location
       } else {
-        console.log('GPS reverse geocoding incomplete:', location)
+        console.log('❌ GPS reverse geocoding incomplete or missing data:', {
+          hasCountry: !!location?.country,
+          hasCountryCode: !!location?.countryCode,
+          hasRegion: !!location?.region,
+          hasCity: !!location?.city,
+          data: location
+        })
       }
     } catch (error) {
-      console.log('GPS location failed, trying IP-based detection:', error instanceof Error ? error.message : String(error))
+      const errorMsg = error instanceof Error ? error.message : String(error)
+      console.log('❌ GPS location failed:', errorMsg)
+      console.log('🔄 Trying IP-based detection as fallback...')
     }
 
     // Method 2: Fallback to IP-based detection
-    console.log('Attempting IP-based location...')
+    console.log('🌐 Attempting IP-based location...')
     const ipLocation = await getLocationByIP()
-    if (ipLocation && ipLocation.country && ipLocation.city) {
-      console.log('Location detected via IP:', ipLocation)
+    
+    if (ipLocation && ipLocation.country && ipLocation.city && ipLocation.countryCode) {
+      console.log('🎯 Location detected via IP:', {
+        country: ipLocation.country,
+        countryCode: ipLocation.countryCode,
+        region: ipLocation.region,
+        city: ipLocation.city
+      })
       return ipLocation
     } else {
-      console.log('IP location incomplete:', ipLocation)
+      console.log('❌ IP location incomplete or missing data:', {
+        hasCountry: !!ipLocation?.country,
+        hasCountryCode: !!ipLocation?.countryCode,
+        hasRegion: !!ipLocation?.region,
+        hasCity: !!ipLocation?.city,
+        data: ipLocation
+      })
     }
 
-    console.log('All location detection methods failed or returned incomplete data')
+    console.log('🚫 All location detection methods failed or returned incomplete data')
     return null
   } catch (error) {
-    console.error('All location detection methods failed:', error)
+    console.error('💥 Critical error in location detection:', error)
     return null
   }
 }

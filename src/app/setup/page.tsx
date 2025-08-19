@@ -31,46 +31,120 @@ export default function SetupPage() {
   const availableRegions = selectedCountry ? selectedCountry.regions : []
   const selectedRegion = availableRegions.find(r => r.code === regionCode)
 
-  // Auto-detect location on component mount
+  // Auto-detect location on component mount (once per session)
   useEffect(() => {
+    const SESSION_KEY = 'location-detection-result'
+    const DETECTION_ATTEMPTED_KEY = 'location-detection-attempted'
+    
     const detectLocation = async () => {
+      // Check if we already have a cached result for this session
+      const cachedResult = sessionStorage.getItem(SESSION_KEY)
+      const detectionAttempted = sessionStorage.getItem(DETECTION_ATTEMPTED_KEY)
+      
+      if (cachedResult) {
+        console.log('Using cached location detection result')
+        const cached = JSON.parse(cachedResult)
+        
+        if (cached.success && cached.data) {
+          setCountryCode(cached.data.countryCode)
+          setRegionCode(cached.data.regionCode || '')
+          setCity(cached.data.city)
+          setDetectionStatus('success')
+        } else {
+          // Use cached failure result
+          setCountryCode(cached.fallbackCountry || 'AU')
+          setRegionCode(cached.fallbackRegion || 'QLD') 
+          setCity(cached.fallbackCity || 'Cairns')
+          setDetectionStatus('failed')
+        }
+        return
+      }
+      
+      // If we already attempted detection in this session, don't try again
+      if (detectionAttempted === 'true') {
+        console.log('Location detection already attempted this session')
+        setDetectionStatus('failed')
+        setCountryCode('AU')
+        setRegionCode('QLD')
+        setCity('Cairns')
+        return
+      }
+
+      console.log('Starting fresh location detection...')
       setIsDetecting(true)
       setDetectionStatus('detecting')
+      
+      // Mark that we've attempted detection
+      sessionStorage.setItem(DETECTION_ATTEMPTED_KEY, 'true')
 
       try {
         const detected = await autoDetectLocation()
         
-        if (detected) {
-          // Set detected values
-          setCountryCode(detected.countryCode)
+        if (detected && detected.country && detected.city) {
+          console.log('Location detection successful:', detected)
           
           // Find matching region
           const country = getCountryByCode(detected.countryCode)
+          let regionCode = ''
+          
           if (country) {
             const region = country.regions.find(r => 
               r.name.toLowerCase() === detected.region.toLowerCase() ||
               r.code.toLowerCase() === detected.regionCode.toLowerCase()
             )
             if (region) {
-              setRegionCode(region.code)
+              regionCode = region.code
             }
           }
           
+          // Set detected values
+          setCountryCode(detected.countryCode)
+          setRegionCode(regionCode)
           setCity(detected.city)
           setDetectionStatus('success')
+          
+          // Cache successful result
+          sessionStorage.setItem(SESSION_KEY, JSON.stringify({
+            success: true,
+            data: {
+              countryCode: detected.countryCode,
+              regionCode,
+              city: detected.city
+            }
+          }))
+          
         } else {
+          console.log('Location detection failed - no valid data returned')
+          
           // Fallback to timezone-based country detection
           const fallbackCountry = detectCountryFromTimezone()
           setCountryCode(fallbackCountry)
           setDetectionStatus('failed')
+          
+          // Cache failed result
+          sessionStorage.setItem(SESSION_KEY, JSON.stringify({
+            success: false,
+            fallbackCountry,
+            fallbackRegion: fallbackCountry === 'AU' ? 'QLD' : '',
+            fallbackCity: fallbackCountry === 'AU' ? 'Cairns' : ''
+          }))
         }
       } catch (error) {
-        console.error('Location detection failed:', error)
+        console.error('Location detection error:', error)
+        
         // Set default to Australia
         setCountryCode('AU')
         setRegionCode('QLD')
         setCity('Cairns')
         setDetectionStatus('failed')
+        
+        // Cache failed result
+        sessionStorage.setItem(SESSION_KEY, JSON.stringify({
+          success: false,
+          fallbackCountry: 'AU',
+          fallbackRegion: 'QLD',
+          fallbackCity: 'Cairns'
+        }))
       } finally {
         setIsDetecting(false)
       }
@@ -142,6 +216,73 @@ export default function SetupPage() {
   const handleCitySelect = (selectedCity: string) => {
     setCity(selectedCity)
     setShowSuggestions(false)
+  }
+
+  const handleRetryDetection = async () => {
+    // Clear session cache to force new detection
+    sessionStorage.removeItem('location-detection-result')
+    sessionStorage.removeItem('location-detection-attempted')
+    
+    setIsDetecting(true)
+    setDetectionStatus('detecting')
+    setCountryCode('')
+    setRegionCode('')
+    setCity('')
+    
+    console.log('Manual retry: Starting fresh location detection...')
+    
+    try {
+      const detected = await autoDetectLocation()
+      
+      if (detected && detected.country && detected.city) {
+        console.log('Manual retry: Location detection successful:', detected)
+        
+        // Find matching region
+        const country = getCountryByCode(detected.countryCode)
+        let regionCode = ''
+        
+        if (country) {
+          const region = country.regions.find(r => 
+            r.name.toLowerCase() === detected.region.toLowerCase() ||
+            r.code.toLowerCase() === detected.regionCode.toLowerCase()
+          )
+          if (region) {
+            regionCode = region.code
+          }
+        }
+        
+        // Set detected values
+        setCountryCode(detected.countryCode)
+        setRegionCode(regionCode)
+        setCity(detected.city)
+        setDetectionStatus('success')
+        
+        // Cache successful result
+        sessionStorage.setItem('location-detection-result', JSON.stringify({
+          success: true,
+          data: {
+            countryCode: detected.countryCode,
+            regionCode,
+            city: detected.city
+          }
+        }))
+        
+      } else {
+        console.log('Manual retry: Location detection failed')
+        const fallbackCountry = detectCountryFromTimezone()
+        setCountryCode(fallbackCountry)
+        setDetectionStatus('failed')
+      }
+    } catch (error) {
+      console.error('Manual retry: Location detection error:', error)
+      setCountryCode('AU')
+      setRegionCode('QLD')
+      setCity('Cairns')
+      setDetectionStatus('failed')
+    } finally {
+      setIsDetecting(false)
+      sessionStorage.setItem('location-detection-attempted', 'true')
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -228,9 +369,25 @@ export default function SetupPage() {
 
           {!isDetecting && detectionStatus === 'failed' && (
             <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-              <div className="flex items-center gap-2 text-yellow-700">
-                <AlertCircle className="w-4 h-4" />
-                <span className="text-sm">Could not detect location. Please enter manually.</span>
+              <div className="flex items-center justify-between text-yellow-700">
+                <div className="flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4" />
+                  <div>
+                    <span className="text-sm">Could not detect location. Please enter manually.</span>
+                    <p className="text-xs mt-1 opacity-75">
+                      Check browser console (F12) for detailed error information.
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRetryDetection}
+                  className="text-xs border-yellow-300 hover:bg-yellow-100 flex-shrink-0"
+                >
+                  Try Again
+                </Button>
               </div>
             </div>
           )}
