@@ -22,6 +22,7 @@ export default function SetupPage() {
   const [citySuggestions, setCitySuggestions] = useState<string[]>([])
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [validationStatus, setValidationStatus] = useState<'none' | 'valid' | 'invalid'>('none')
+  const [isAutoPopulating, setIsAutoPopulating] = useState(false) // Flag to prevent clearing during auto-population
   
   const { setLocation } = useLocationStore()
   const router = useRouter()
@@ -42,6 +43,10 @@ export default function SetupPage() {
   useEffect(() => {
     console.log('Detection status changed to:', detectionStatus)
   }, [detectionStatus])
+
+  useEffect(() => {
+    console.log('isAutoPopulating changed to:', isAutoPopulating)
+  }, [isAutoPopulating])
 
   // Get current country and region objects
   const selectedCountry = getCountryByCode(countryCode)
@@ -68,18 +73,36 @@ export default function SetupPage() {
           console.log('Setting cached regionCode:', cached.data.regionCode || '')
           console.log('Setting cached city:', cached.data.city || '')
           
+          // Set auto-populating flag to prevent handlers from clearing fields
+          setIsAutoPopulating(true)
+          
           setCountryCode(cached.data.countryCode)
           setRegionCode(cached.data.regionCode || '')
           setCity(cached.data.city || '')
           setDetectionStatus(cached.partial ? 'partial' : 'success')
           
           console.log('Cached form values should now be set!')
+          
+          // Clear the flag after a short delay to allow all state updates to complete
+          setTimeout(() => {
+            setIsAutoPopulating(false)
+            console.log('Auto-population complete - handlers will now work normally')
+          }, 100)
         } else {
           // Use cached failure result
+          // Set auto-populating flag to prevent handlers from clearing fields
+          setIsAutoPopulating(true)
+          
           setCountryCode(cached.fallbackCountry || 'AU')
           setRegionCode(cached.fallbackRegion || 'QLD') 
           setCity(cached.fallbackCity || 'Cairns')
           setDetectionStatus('failed')
+          
+          // Clear the flag after a short delay
+          setTimeout(() => {
+            setIsAutoPopulating(false)
+            console.log('Fallback auto-population complete - handlers will now work normally')
+          }, 100)
         }
         return
       }
@@ -88,9 +111,20 @@ export default function SetupPage() {
       if (detectionAttempted === 'true') {
         console.log('Location detection already attempted this session')
         setDetectionStatus('failed')
+        
+        // Set auto-populating flag to prevent handlers from clearing fields
+        setIsAutoPopulating(true)
+        
         setCountryCode('AU')
         setRegionCode('QLD')
         setCity('Cairns')
+        
+        // Clear the flag after a short delay
+        setTimeout(() => {
+          setIsAutoPopulating(false)
+          console.log('Session fallback auto-population complete - handlers will now work normally')
+        }, 100)
+        
         return
       }
 
@@ -142,12 +176,21 @@ export default function SetupPage() {
           console.log('Setting regionCode:', regionCode)
           console.log('Setting city:', detected.city || '')
           
+          // Set auto-populating flag to prevent handlers from clearing fields
+          setIsAutoPopulating(true)
+          
           setCountryCode(detected.countryCode)
           setRegionCode(regionCode)
           setCity(detected.city || '') // City might be empty but that's ok
           setDetectionStatus(detected.city ? 'success' : 'partial')
           
           console.log('Form values should now be set!')
+          
+          // Clear the flag after a short delay to allow all state updates to complete
+          setTimeout(() => {
+            setIsAutoPopulating(false)
+            console.log('Auto-population complete - handlers will now work normally')
+          }, 100)
           
           // Cache successful result
           sessionStorage.setItem(SESSION_KEY, JSON.stringify({
@@ -165,8 +208,18 @@ export default function SetupPage() {
           
           // Fallback to timezone-based country detection
           const fallbackCountry = detectCountryFromTimezone()
+          
+          // Set auto-populating flag to prevent handlers from clearing fields
+          setIsAutoPopulating(true)
+          
           setCountryCode(fallbackCountry)
           setDetectionStatus('failed')
+          
+          // Clear the flag after a short delay
+          setTimeout(() => {
+            setIsAutoPopulating(false)
+            console.log('Detection failure fallback auto-population complete - handlers will now work normally')
+          }, 100)
           
           // Cache failed result
           sessionStorage.setItem(SESSION_KEY, JSON.stringify({
@@ -179,11 +232,20 @@ export default function SetupPage() {
       } catch (error) {
         console.error('Location detection error:', error)
         
+        // Set auto-populating flag to prevent handlers from clearing fields
+        setIsAutoPopulating(true)
+        
         // Set default to Australia
         setCountryCode('AU')
         setRegionCode('QLD')
         setCity('Cairns')
         setDetectionStatus('failed')
+        
+        // Clear the flag after a short delay
+        setTimeout(() => {
+          setIsAutoPopulating(false)
+          console.log('Main detection error fallback auto-population complete - handlers will now work normally')
+        }, 100)
         
         // Cache failed result
         sessionStorage.setItem(SESSION_KEY, JSON.stringify({
@@ -237,14 +299,30 @@ export default function SetupPage() {
   }, [city, selectedRegion, selectedCountry])
 
   const handleCountryChange = (value: string) => {
+    console.log('handleCountryChange called with:', value, 'isAutoPopulating:', isAutoPopulating)
     setCountryCode(value)
-    setRegionCode('') // Reset region when country changes
-    setCity('') // Reset city when country changes
+    
+    // Only reset other fields if this is a manual user change, not auto-population
+    if (!isAutoPopulating) {
+      console.log('Manual country change - resetting region and city')
+      setRegionCode('') // Reset region when country changes
+      setCity('') // Reset city when country changes
+    } else {
+      console.log('Auto-population in progress - NOT resetting region and city')
+    }
   }
 
   const handleRegionChange = (value: string) => {
+    console.log('handleRegionChange called with:', value, 'isAutoPopulating:', isAutoPopulating)
     setRegionCode(value)
-    setCity('') // Reset city when region changes
+    
+    // Only reset city if this is a manual user change, not auto-population
+    if (!isAutoPopulating) {
+      console.log('Manual region change - resetting city')
+      setCity('') // Reset city when region changes
+    } else {
+      console.log('Auto-population in progress - NOT resetting city')
+    }
   }
 
   const handleCityChange = (value: string) => {
@@ -299,10 +377,19 @@ export default function SetupPage() {
         }
         
         // Set detected values
+        // Set auto-populating flag to prevent handlers from clearing fields
+        setIsAutoPopulating(true)
+        
         setCountryCode(detected.countryCode)
         setRegionCode(regionCode)
         setCity(detected.city || '')
         setDetectionStatus(detected.city ? 'success' : 'partial')
+        
+        // Clear the flag after a short delay to allow all state updates to complete
+        setTimeout(() => {
+          setIsAutoPopulating(false)
+          console.log('Manual retry auto-population complete - handlers will now work normally')
+        }, 100)
         
         // Cache successful result
         sessionStorage.setItem('location-detection-result', JSON.stringify({
@@ -318,15 +405,35 @@ export default function SetupPage() {
       } else {
         console.log('Manual retry: Location detection failed')
         const fallbackCountry = detectCountryFromTimezone()
+        
+        // Set auto-populating flag to prevent handlers from clearing fields
+        setIsAutoPopulating(true)
+        
         setCountryCode(fallbackCountry)
         setDetectionStatus('failed')
+        
+        // Clear the flag after a short delay
+        setTimeout(() => {
+          setIsAutoPopulating(false)
+          console.log('Manual retry fallback auto-population complete - handlers will now work normally')
+        }, 100)
       }
     } catch (error) {
       console.error('Manual retry: Location detection error:', error)
+      
+      // Set auto-populating flag to prevent handlers from clearing fields
+      setIsAutoPopulating(true)
+      
       setCountryCode('AU')
       setRegionCode('QLD')
       setCity('Cairns')
       setDetectionStatus('failed')
+      
+      // Clear the flag after a short delay
+      setTimeout(() => {
+        setIsAutoPopulating(false)
+        console.log('Manual retry error fallback auto-population complete - handlers will now work normally')
+      }, 100)
     } finally {
       setIsDetecting(false)
       sessionStorage.setItem('location-detection-attempted', 'true')
