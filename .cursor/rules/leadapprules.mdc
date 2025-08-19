@@ -1,0 +1,205 @@
+---
+alwaysApply: true
+---
+
+Coding & Project Structure
+
+Use Next.js 14 (App Router) + TypeScript.
+
+Components under src/components/*; stores under src/stores/*; API under src/app/api/*.
+
+Create reusable UI atoms (Buttons/Badges/Checkbox) via shadcn/ui generator.
+
+All styling with Tailwind; keep classlists readable; extract variants with cn() and class-variance-authority if needed.
+
+Data & State
+
+Create Zustand slices: results, filters, contacted, exclude. Persist with zustand/middleware (persist, createJSONStorage).
+
+Define TypeScript types in src/types/business.ts. No any.
+
+Debounce notes updates (500ms) to store.
+
+API & Security
+
+Never call Google Places directly from the browser with an unrestricted key.
+
+All Places calls go through /api/places/* routes with the server-side key.
+
+In GCP console: restrict key to required APIs (Places), set referrer/IP/domain restrictions.
+
+Use field masks to minimize Places cost.
+
+UX Rules
+
+Results always show Name, Category, Suburb, Postcode, Phone, Website, Selling Points, Notes, Called, Emailed.
+
+Called/Emailed checkboxes instantly move item to Contacted tab and add to exclude list.
+
+Notes are editable in both tabs and stay in sync.
+
+Filters are sticky per session (persisted).
+
+Sort defaults to Most active.
+
+All external links open in a new tab with rel="noopener".
+
+Phone & AU Logic
+
+Format numbers with libphonenumber-js.
+
+Mobile: starts with 04. QLD landline: starts with 07.
+
+tel: links must use the formatted E.164 or AU national form.
+
+Cairns Filters
+
+Provide arrays for suburbs & postcodes listed in the brief.
+
+Filter matching is case-insensitive and supports multiple selection.
+
+Keep arrays in src/data/locations.ts for easy edits.
+
+Selling Points
+
+Only compute using safe heuristics (no network scraping in MVP).
+
+Show badges with tooltips explaining the rule (e.g., “Facebook-only = website links to Facebook/Instagram”).
+
+Tables
+
+Use TanStack Table with column defs typed in TS.
+
+Support client-side sorting & filtering; paginate to 25 rows/page.
+
+Accessibility & QA
+
+All inputs labelled, checkboxes keyboard-accessible, focus states visible.
+
+Run basic Lighthouse check; aim for >90 accessibility.
+
+Add simple unit tests for selling-points derivation and phone classification.
+
+Performance
+
+Avoid N+1 Place Details calls when not needed; if Text Search returns website/phone equivalents, skip details.
+
+Cache Place Details for current session (Map placeId → details).
+
+Use useMemo for derived data.
+
+Commits & Hygiene
+
+Conventional commits: feat:, fix:, chore:, refactor:
+
+Prettier + ESLint on save. No any. No dead code.
+
+Keep components <200 lines where possible; refactor into smaller pieces.
+
+Deployment
+
+Vercel environment vars set for GOOGLE_MAPS_API_KEY.
+
+Protect routes; no secrets in client.
+
+Verify key restrictions before go-live.Coding & Project Structure
+
+Use Next.js 14 (App Router) + TypeScript.
+
+Components under src/components/*; stores under src/stores/*; API under src/app/api/*.
+
+Create reusable UI atoms (Buttons/Badges/Checkbox) via shadcn/ui generator.
+
+All styling with Tailwind; keep classlists readable; extract variants with cn() and class-variance-authority if needed.
+
+Data & State
+
+Create Zustand slices: results, filters, contacted, exclude. Persist with zustand/middleware (persist, createJSONStorage).
+
+Define TypeScript types in src/types/business.ts. No any.
+
+Debounce notes updates (500ms) to store.
+
+API & Security
+
+Never call Google Places directly from the browser with an unrestricted key.
+
+All Places calls go through /api/places/* routes with the server-side key.
+
+In GCP console: restrict key to required APIs (Places), set referrer/IP/domain restrictions.
+
+Use field masks to minimize Places cost.
+
+UX Rules
+
+Results always show Name, Category, Suburb, Postcode, Phone, Website, Selling Points, Notes, Called, Emailed.
+
+Called/Emailed checkboxes instantly move item to Contacted tab and add to exclude list.
+
+Notes are editable in both tabs and stay in sync.
+
+Filters are sticky per session (persisted).
+
+Sort defaults to Most active.
+
+All external links open in a new tab with rel="noopener".
+
+Phone & AU Logic
+
+Format numbers with libphonenumber-js.
+
+Mobile: starts with 04. QLD landline: starts with 07.
+
+tel: links must use the formatted E.164 or AU national form.
+
+Cairns Filters
+
+Provide arrays for suburbs & postcodes listed in the brief.
+
+Filter matching is case-insensitive and supports multiple selection.
+
+Keep arrays in src/data/locations.ts for easy edits.
+
+Selling Points
+
+Only compute using safe heuristics (no network scraping in MVP).
+
+Show badges with tooltips explaining the rule (e.g., “Facebook-only = website links to Facebook/Instagram”).
+
+Tables
+
+Use TanStack Table with column defs typed in TS.
+
+Support client-side sorting & filtering; paginate to 25 rows/page.
+
+Accessibility & QA
+
+All inputs labelled, checkboxes keyboard-accessible, focus states visible.
+
+Run basic Lighthouse check; aim for >90 accessibility.
+
+Add simple unit tests for selling-points derivation and phone classification.
+
+Performance
+
+Avoid N+1 Place Details calls when not needed; if Text Search returns website/phone equivalents, skip details.
+
+Cache Place Details for current session (Map placeId → details).
+
+Use useMemo for derived data.
+
+Commits & Hygiene
+
+Conventional commits: feat:, fix:, chore:, refactor:
+
+Prettier + ESLint on save. No any. No dead code.
+
+Keep components <200 lines where possible; refactor into smaller pieces.
+
+Deployment
+
+Vercel environment vars set for GOOGLE_MAPS_API_KEY.
+
+Protect routes; no secrets in client.
+
+Verify key restrictions before go-live.

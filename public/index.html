@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LumaLead.io - Find Business Prospects Effortlessly</title>
+    <meta name="description" content="The ultimate tool for finding and managing business prospects. Discover quality leads with our advanced search and contact management platform.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1a597c',
+                        'primary-dark': '#144a67',
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s ease-in-out',
+                        'slide-up': 'slideUp 0.8s ease-out',
+                        'bounce-subtle': 'bounceSubtle 2s infinite',
+                        'float': 'float 3s ease-in-out infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes bounceSubtle {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        .bg-gradient-radial {
+            background: radial-gradient(circle at 50% 50%, rgba(26, 89, 124, 0.1) 0%, transparent 50%);
+        }
+        .text-gradient {
+            background: linear-gradient(135deg, #1a597c 0%, #2dd4bf 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .hero-bg {
+            background: linear-gradient(135deg, rgba(26, 89, 124, 0.1) 0%, rgba(59, 130, 246, 0.05) 50%, rgba(16, 185, 129, 0.1) 100%);
+        }
+    </style>
+</head>
+<body class="font-sans text-gray-900 bg-white">
+    <!-- Navigation -->
+    <nav class="fixed w-full top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background-color: #1a597c;">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            </svg>
+                        </div>
+                        <span class="text-2xl font-bold" style="color: #1a597c;">LumaLead.io</span>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#features" class="text-gray-600 hover:text-primary transition-colors">Features</a>
+                    <a href="#about" class="text-gray-600 hover:text-primary transition-colors">About</a>
+                    <a href="#pricing" class="text-gray-600 hover:text-primary transition-colors">Pricing</a>
+                    <a href="#contact" class="text-gray-600 hover:text-primary transition-colors">Contact</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="openLoginModal()" class="text-primary hover:text-primary-dark transition-colors">
+                        Sign In
+                    </button>
+                    <button onclick="openSignupModal()" class="bg-primary hover:bg-primary-dark text-white px-6 py-2 rounded-lg transition-all duration-200 transform hover:scale-105">
+                        Get Started
+                    </button>
+                </div>
+                <!-- Mobile menu button -->
+                <button class="md:hidden" onclick="toggleMobileMenu()">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200">
+            <div class="px-4 py-4 space-y-4">
+                <a href="#features" class="block text-gray-600 hover:text-primary">Features</a>
+                <a href="#about" class="block text-gray-600 hover:text-primary">About</a>
+                <a href="#pricing" class="block text-gray-600 hover:text-primary">Pricing</a>
+                <a href="#contact" class="block text-gray-600 hover:text-primary">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-20 pb-16 hero-bg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <div class="animate-fade-in">
+                    <h1 class="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+                        Find <span class="text-gradient">Quality Leads</span><br>
+                        <span class="text-primary">Effortlessly</span>
+                    </h1>
+                    <p class="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
+                        The ultimate platform for discovering and managing business prospects. Streamline your lead generation with our powerful search tools and smart contact management.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                        <button onclick="openSignupModal()" class="bg-primary hover:bg-primary-dark text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-200 transform hover:scale-105 shadow-lg">
+                            Start Free Trial
+                        </button>
+                        <button onclick="document.getElementById('demo-video').scrollIntoView({behavior: 'smooth'})" class="border-2 border-primary text-primary hover:bg-primary hover:text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-200">
+                            Watch Demo
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Hero Image/Animation -->
+                <div class="mt-16 animate-slide-up">
+                    <div class="relative max-w-4xl mx-auto">
+                        <div class="bg-white rounded-2xl shadow-2xl p-8 border border-gray-200">
+                            <div class="flex items-center space-x-2 mb-6">
+                                <div class="w-3 h-3 bg-red-400 rounded-full"></div>
+                                <div class="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                                <div class="w-3 h-3 bg-green-400 rounded-full"></div>
+                                <div class="flex-1 bg-gray-100 rounded px-4 py-2 ml-4">
+                                    <div class="flex items-center space-x-2">
+                                        <div class="w-4 h-4 rounded-full" style="background-color: #1a597c;"></div>
+                                        <span class="text-sm text-gray-600">LumaLead.io - Dashboard</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Mock Dashboard -->
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="w-10 h-10 rounded-full" style="background-color: #1a597c;"></div>
+                                        <div>
+                                            <div class="font-semibold">Eagle Accounting</div>
+                                            <div class="text-sm text-gray-500">Cairns City QLD 4870</div>
+                                        </div>
+                                    </div>
+                                    <div class="flex space-x-2">
+                                        <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">Mobile Phone</span>
+                                        <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">Website</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="w-10 h-10 rounded-full" style="background-color: #1a597c;"></div>
+                                        <div>
+                                            <div class="font-semibold">Super Accounting</div>
+                                            <div class="text-sm text-gray-500">Woree QLD 4868</div>
+                                        </div>
+                                    </div>
+                                    <div class="flex space-x-2">
+                                        <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">Mobile Phone</span>
+                                        <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">No Website</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Floating elements -->
+                        <div class="absolute -top-8 -left-8 w-16 h-16 bg-primary/10 rounded-full animate-float"></div>
+                        <div class="absolute -bottom-8 -right-8 w-20 h-20 bg-green-400/10 rounded-full animate-float" style="animation-delay: 1s;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold text-primary mb-6">Powerful Features</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Everything you need to find, manage, and convert prospects into customers
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="text-center p-8 card-hover bg-white rounded-2xl border border-gray-200">
+                    <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-primary mb-4">Smart Search</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Advanced search algorithms to find exactly the prospects you need. Filter by location, business type, contact details, and more.
+                    </p>
+                </div>
+                
+                <div class="text-center p-8 card-hover bg-white rounded-2xl border border-gray-200">
+                    <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-primary mb-4">Contact Management</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Keep track of all your interactions. Add notes, mark contacts as called or emailed, and never lose track of your prospects.
+                    </p>
+                </div>
+                
+                <div class="text-center p-8 card-hover bg-white rounded-2xl border border-gray-200">
+                    <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-primary mb-4">Analytics & Reports</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Export your data, print professional reports, and analyze your outreach performance with built-in analytics tools.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Additional Features -->
+            <div class="mt-16 grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h3 class="text-3xl font-bold text-primary mb-6">Real-time Business Data</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900">Google Places Integration</h4>
+                                <p class="text-gray-600">Access up-to-date business information directly from Google's database</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4">
+                            <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900">Smart Selling Points</h4>
+                                <p class="text-gray-600">Automatically identify opportunities like missing websites or mobile numbers</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4">
+                            <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900">Location-based Search</h4>
+                                <p class="text-gray-600">Find prospects in specific areas with precise geographic filtering</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gradient-radial p-8 rounded-2xl">
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-sm font-medium text-gray-500">Live Search Results</span>
+                            <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Online</span>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg animate-pulse">
+                                <div class="w-8 h-8 bg-primary rounded-full"></div>
+                                <div class="flex-1">
+                                    <div class="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                                    <div class="h-3 bg-gray-200 rounded w-1/2"></div>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg animate-pulse" style="animation-delay: 0.2s;">
+                                <div class="w-8 h-8 bg-primary rounded-full"></div>
+                                <div class="flex-1">
+                                    <div class="h-4 bg-gray-200 rounded w-2/3 mb-2"></div>
+                                    <div class="h-3 bg-gray-200 rounded w-3/4"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h2 class="text-4xl md:text-5xl font-bold text-primary mb-6">About LumaLead.io</h2>
+                    <p class="text-xl text-gray-600 mb-6 leading-relaxed">
+                        Born from the need to simplify business prospecting, LumaLead.io transforms how professionals find and manage potential clients.
+                    </p>
+                    <p class="text-gray-600 mb-8 leading-relaxed">
+                        Our platform combines powerful search capabilities with intelligent contact management, giving you everything needed to build meaningful business relationships. Whether you're a consultant, agency, or sales professional, we help you discover quality prospects and track your outreach efforts efficiently.
+                    </p>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="text-center p-4">
+                            <div class="text-3xl font-bold text-primary mb-2">10,000+</div>
+                            <div class="text-gray-600">Businesses Found</div>
+                        </div>
+                        <div class="text-center p-4">
+                            <div class="text-3xl font-bold text-primary mb-2">500+</div>
+                            <div class="text-gray-600">Happy Users</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="relative">
+                    <div class="bg-white rounded-2xl shadow-2xl p-8 relative z-10">
+                        <div class="text-center mb-6">
+                            <div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                                </svg>
+                            </div>
+                            <h3 class="text-2xl font-bold text-primary mb-2">Our Mission</h3>
+                            <p class="text-gray-600">
+                                Empowering businesses to find their perfect prospects through intelligent technology and intuitive design.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="absolute inset-0 bg-primary/5 rounded-2xl transform rotate-3"></div>
+                    <div class="absolute -bottom-4 -right-4 w-24 h-24 bg-primary/10 rounded-full animate-bounce-subtle"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold text-primary mb-6">Choose Your Plan</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Start finding quality prospects today with our flexible pricing options
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                <!-- Monthly Plan -->
+                <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-8 card-hover">
+                    <div class="text-center">
+                        <h3 class="text-2xl font-bold text-primary mb-4">Monthly</h3>
+                        <div class="mb-6">
+                            <span class="text-4xl font-bold text-primary">$12.99</span>
+                            <span class="text-gray-500">/month</span>
+                        </div>
+                        <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">14-day free trial</span>
+                    </div>
+                    <ul class="mt-8 space-y-4">
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Unlimited business searches
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Contact management
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Export functionality
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Email support
+                        </li>
+                    </ul>
+                    <button onclick="startTrial('monthly')" class="w-full mt-8 bg-primary hover:bg-primary-dark text-white py-3 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105">
+                        Start Free Trial
+                    </button>
+                </div>
+
+                <!-- Yearly Plan (Featured) -->
+                <div class="bg-white rounded-2xl shadow-2xl border-2 border-primary p-8 card-hover relative scale-105">
+                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                        <span class="bg-primary text-white px-6 py-2 rounded-full text-sm font-semibold">Most Popular</span>
+                    </div>
+                    <div class="text-center">
+                        <h3 class="text-2xl font-bold text-primary mb-4">Yearly</h3>
+                        <div class="mb-6">
+                            <span class="text-4xl font-bold text-primary">$124.99</span>
+                            <span class="text-gray-500">/year</span>
+                        </div>
+                        <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">Save 20%</span>
+                    </div>
+                    <ul class="mt-8 space-y-4">
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Everything in Monthly
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Priority support
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Advanced filtering
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            API access
+                        </li>
+                    </ul>
+                    <button onclick="startTrial('yearly')" class="w-full mt-8 bg-primary hover:bg-primary-dark text-white py-3 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105">
+                        Get Yearly Plan
+                    </button>
+                </div>
+
+                <!-- Lifetime Plan -->
+                <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-8 card-hover">
+                    <div class="text-center">
+                        <h3 class="text-2xl font-bold text-primary mb-4">Lifetime</h3>
+                        <div class="mb-6">
+                            <span class="text-4xl font-bold text-primary">$299</span>
+                            <span class="text-gray-500"> once</span>
+                        </div>
+                        <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">Best Value</span>
+                    </div>
+                    <ul class="mt-8 space-y-4">
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Everything in Yearly
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Lifetime updates
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            VIP support
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            No recurring payments
+                        </li>
+                    </ul>
+                    <button onclick="startTrial('lifetime')" class="w-full mt-8 bg-primary hover:bg-primary-dark text-white py-3 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105">
+                        Get Lifetime Access
+                    </button>
+                </div>
+            </div>
+            
+            <div class="text-center mt-12">
+                <p class="text-gray-600">
+                    All plans include a 14-day free trial. No credit card required to start.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold text-primary mb-6">Get In Touch</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.
+                </p>
+            </div>
+            
+            <div class="grid lg:grid-cols-2 gap-12">
+                <div>
+                    <div class="space-y-8">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold text-primary mb-2">Email Us</h3>
+                                <p class="text-gray-600">hello@leadgen.io</p>
+                                <p class="text-gray-600">support@leadgen.io</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-4">
+                            <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold text-primary mb-2">Visit Us</h3>
+                                <p class="text-gray-600">Cairns, Queensland<br>Australia</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-4">
+                            <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-semibold text-primary mb-2">Support Hours</h3>
+                                <p class="text-gray-600">Monday - Friday: 9AM - 6PM AEST<br>Weekend: Limited support</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-2xl shadow-lg p-8">
+                    <form onsubmit="submitContact(event)" class="space-y-6">
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+                                <input type="text" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                                <input type="text" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                            <input type="email" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Subject</label>
+                            <input type="text" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Message</label>
+                            <textarea rows="5" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-primary hover:bg-primary-dark text-white py-3 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105">
+                            Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-6">
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background-color: #1a597c;">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            </svg>
+                        </div>
+                        <span class="text-xl font-bold">LumaLead.io</span>
+                    </div>
+                    <p class="text-gray-400 leading-relaxed">
+                        The ultimate platform for finding and managing business prospects. Streamline your lead generation today.
+                    </p>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-6">Product</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#features" class="text-gray-400 hover:text-white transition-colors">Features</a></li>
+                        <li><a href="#pricing" class="text-gray-400 hover:text-white transition-colors">Pricing</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">API</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Documentation</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-6">Company</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#about" class="text-gray-400 hover:text-white transition-colors">About</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Blog</a></li>
+                        <li><a href="#contact" class="text-gray-400 hover:text-white transition-colors">Contact</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Careers</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-6">Support</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Help Center</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Terms of Service</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Status</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-12 pt-8 text-center">
+                <p class="text-gray-400">
+                    © 2025 Corah Media Pty Ltd. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-8 transform transition-all duration-300 scale-95 opacity-0" id="loginModalContent">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold text-primary mb-2">Welcome Back</h2>
+                <p class="text-gray-600">Sign in to your LumaLead.io account</p>
+            </div>
+            
+            <form onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input type="email" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <input type="password" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                </div>
+                <button type="submit" class="w-full bg-primary hover:bg-primary-dark text-white py-3 rounded-lg font-semibold transition-all duration-200">
+                    Sign In
+                </button>
+            </form>
+            
+            <div class="text-center mt-6">
+                <p class="text-gray-600">
+                    Don't have an account? 
+                    <button onclick="closeLoginModal(); openSignupModal();" class="text-primary hover:underline">Sign up</button>
+                </p>
+            </div>
+            
+            <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div id="signupModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-8 transform transition-all duration-300 scale-95 opacity-0" id="signupModalContent">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold text-primary mb-2">Get Started</h2>
+                <p class="text-gray-600">Create your LumaLead.io account</p>
+            </div>
+            
+            <form onsubmit="handleSignup(event)" class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+                        <input type="text" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                        <input type="text" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input type="email" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <input type="password" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                </div>
+                <button type="submit" class="w-full bg-primary hover:bg-primary-dark text-white py-3 rounded-lg font-semibold transition-all duration-200">
+                    Start Free Trial
+                </button>
+            </form>
+            
+            <div class="text-center mt-6">
+                <p class="text-gray-600">
+                    Already have an account? 
+                    <button onclick="closeSignupModal(); openLoginModal();" class="text-primary hover:underline">Sign in</button>
+                </p>
+            </div>
+            
+            <button onclick="closeSignupModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Navigation Functions
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Modal Functions
+        function openLoginModal() {
+            const modal = document.getElementById('loginModal');
+            const content = document.getElementById('loginModalContent');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeLoginModal() {
+            const modal = document.getElementById('loginModal');
+            const content = document.getElementById('loginModalContent');
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        function openSignupModal() {
+            const modal = document.getElementById('signupModal');
+            const content = document.getElementById('signupModalContent');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeSignupModal() {
+            const modal = document.getElementById('signupModal');
+            const content = document.getElementById('signupModalContent');
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        // Form Handlers
+        function handleLogin(event) {
+            event.preventDefault();
+            // Here you would typically handle the login
+            // For demo purposes, we'll redirect to the app
+            window.location.href = '/auth';
+        }
+
+        function handleSignup(event) {
+            event.preventDefault();
+            // Here you would typically handle the signup
+            // For demo purposes, we'll redirect to the app
+            window.location.href = '/auth';
+        }
+
+        function submitContact(event) {
+            event.preventDefault();
+            alert('Thank you for your message! We\'ll get back to you soon.');
+            event.target.reset();
+        }
+
+        function startTrial(plan) {
+            // Redirect to signup/pricing page
+            window.location.href = '/auth';
+        }
+
+        // Close modals when clicking outside
+        document.addEventListener('click', function(event) {
+            const loginModal = document.getElementById('loginModal');
+            const signupModal = document.getElementById('signupModal');
+            
+            if (event.target === loginModal) {
+                closeLoginModal();
+            }
+            if (event.target === signupModal) {
+                closeSignupModal();
+            }
+        });
+
+        // Smooth scrolling for navigation links
+        document.addEventListener('DOMContentLoaded', function() {
+            const links = document.querySelectorAll('a[href^="#"]');
+            links.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        });
+
+        // Add scroll effect to navigation
+        window.addEventListener('scroll', function() {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 100) {
+                nav.classList.add('bg-white/95');
+                nav.classList.remove('bg-white/80');
+            } else {
+                nav.classList.add('bg-white/80');
+                nav.classList.remove('bg-white/95');
+            }
+        });
+    </script>
+</body>
+</html>
