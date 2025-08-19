@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -49,10 +49,10 @@ export default function SetupPage() {
     console.log('isAutoPopulating changed to:', isAutoPopulating)
   }, [isAutoPopulating])
 
-  // Get current country and region objects
-  const selectedCountry = getCountryByCode(countryCode)
-  const availableRegions = selectedCountry ? selectedCountry.regions : []
-  const selectedRegion = availableRegions.find(r => r.code === regionCode)
+  // Get current country and region objects (memoized for performance)
+  const selectedCountry = useMemo(() => getCountryByCode(countryCode), [countryCode])
+  const availableRegions = useMemo(() => selectedCountry ? selectedCountry.regions : [], [selectedCountry])
+  const selectedRegion = useMemo(() => availableRegions.find(r => r.code === regionCode), [availableRegions, regionCode])
 
   // Auto-detect location on component mount (once per session)
   useEffect(() => {
@@ -60,6 +60,37 @@ export default function SetupPage() {
     if (autoPopulationCompleted.current) {
       console.log('Auto-population already completed, skipping duplicate run')
       return
+    }
+
+    // First, check if user has manually set a location
+    const USER_SELECTION_KEY = 'user-location-selection'
+    const savedSelection = sessionStorage.getItem(USER_SELECTION_KEY)
+    
+    if (savedSelection) {
+      try {
+        const selection = JSON.parse(savedSelection)
+        console.log('💾 Loading user previous selection:', selection)
+        
+        console.log('🔄 USER: Starting auto-population with saved selection')
+        setIsAutoPopulating(true)
+        
+        setTimeout(() => {
+          setCountryCode(selection.countryCode || '')
+          setRegionCode(selection.regionCode || '') 
+          setCity(selection.city || '')
+          setDetectionStatus('success')
+        }, 50)
+        
+        setTimeout(() => {
+          setIsAutoPopulating(false)
+          autoPopulationCompleted.current = true
+          console.log('🔄 USER: Auto-population complete from saved selection')
+        }, 150)
+        
+        return // Don't run detection if we have user selection
+      } catch (error) {
+        console.error('Error loading user selection:', error)
+      }
     }
 
     const SESSION_KEY = 'location-detection-result'
@@ -279,13 +310,15 @@ export default function SetupPage() {
     detectLocation()
   }, [])
 
+  // Memoized city suggestions for better performance
+  const defaultCitySuggestions = useMemo(() => {
+    return countryCode ? searchCitiesByCountry(countryCode, '').slice(0, 8) : []
+  }, [countryCode])
+
   // Update city suggestions when country changes
   useEffect(() => {
-    if (countryCode) {
-      const suggestions = searchCitiesByCountry(countryCode, '')
-      setCitySuggestions(suggestions)
-    }
-  }, [countryCode])
+    setCitySuggestions(defaultCitySuggestions)
+  }, [defaultCitySuggestions])
 
   // Validate location when inputs change (only validate after user stops typing for 2 seconds)
   useEffect(() => {
@@ -315,7 +348,7 @@ export default function SetupPage() {
     return () => clearTimeout(timeoutId)
   }, [city, selectedRegion, selectedCountry])
 
-  const handleCountryChange = (value: string) => {
+  const handleCountryChange = useCallback((value: string) => {
     console.log('🎛️ handleCountryChange called with:', JSON.stringify(value), 'length:', value?.length, 'isAutoPopulating:', isAutoPopulating, 'autoCompleted:', autoPopulationCompleted.current)
     setCountryCode(value)
     
@@ -327,9 +360,9 @@ export default function SetupPage() {
     } else {
       console.log('Auto-population in progress - NOT resetting region and city')
     }
-  }
+  }, [isAutoPopulating])
 
-  const handleRegionChange = (value: string) => {
+  const handleRegionChange = useCallback((value: string) => {
     console.log('🎛️ handleRegionChange called with:', JSON.stringify(value), 'length:', value?.length, 'isAutoPopulating:', isAutoPopulating, 'autoCompleted:', autoPopulationCompleted.current)
     setRegionCode(value)
     
@@ -340,27 +373,29 @@ export default function SetupPage() {
     } else {
       console.log('Auto-population in progress - NOT resetting city')
     }
-  }
+  }, [isAutoPopulating])
 
-  const handleCityChange = (value: string) => {
+  const handleCityChange = useCallback((value: string) => {
     setCity(value)
     
     // Update suggestions based on input
     if (countryCode && value.length > 0) {
       const suggestions = searchCitiesByCountry(countryCode, value)
-      setCitySuggestions(suggestions)
+      setCitySuggestions(suggestions.slice(0, 8)) // Limit to 8 suggestions
       setShowSuggestions(suggestions.length > 0)
     } else {
-      setShowSuggestions(false)
+      // Use default suggestions when input is empty
+      setCitySuggestions(defaultCitySuggestions)
+      setShowSuggestions(defaultCitySuggestions.length > 0)
     }
-  }
+  }, [countryCode, defaultCitySuggestions])
 
-  const handleCitySelect = (selectedCity: string) => {
+  const handleCitySelect = useCallback((selectedCity: string) => {
     setCity(selectedCity)
     setShowSuggestions(false)
-  }
+  }, [])
 
-  const handleRetryDetection = async () => {
+  const handleRetryDetection = useCallback(async () => {
     // Clear session cache to force new detection
     sessionStorage.removeItem('location-detection-result')
     sessionStorage.removeItem('location-detection-attempted')
@@ -455,7 +490,7 @@ export default function SetupPage() {
       setIsDetecting(false)
       sessionStorage.setItem('location-detection-attempted', 'true')
     }
-  }
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -477,6 +512,18 @@ export default function SetupPage() {
       } catch (validationError) {
         console.log('Validation failed, proceeding without coordinates:', validationError)
       }
+
+      // Save user's manual selection to session storage for future visits
+      const USER_SELECTION_KEY = 'user-location-selection'
+      const userSelection = {
+        countryCode,
+        regionCode,
+        city,
+        countryName: selectedCountry.name,
+        regionName: selectedRegion.name
+      }
+      sessionStorage.setItem(USER_SELECTION_KEY, JSON.stringify(userSelection))
+      console.log('💾 Saved user location selection:', userSelection)
 
       setLocation({
         country: selectedCountry.name,
