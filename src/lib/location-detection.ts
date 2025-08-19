@@ -142,7 +142,7 @@ export async function autoDetectLocation(): Promise<DetectedLocation | null> {
         return location
       }
     } catch (error) {
-      console.log('GPS location failed, trying IP-based detection:', error.message)
+      console.log('GPS location failed, trying IP-based detection:', error instanceof Error ? error.message : String(error))
     }
 
     // Method 2: Fallback to IP-based detection
