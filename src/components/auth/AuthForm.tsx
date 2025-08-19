@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -31,6 +31,23 @@ export function AuthForm({ mode = 'signin', redirectTo = '/app' }: AuthFormProps
   const router = useRouter()
   const supabase = createClientSupabaseClient()
 
+  // Debug: Test Supabase connection on component mount
+  useEffect(() => {
+    const testConnection = async () => {
+      try {
+        const { data, error } = await supabase.auth.getSession()
+        console.log('Supabase connection test:', { 
+          connected: !error, 
+          session: !!data.session,
+          error: error?.message 
+        })
+      } catch (err) {
+        console.error('Supabase connection failed:', err)
+      }
+    }
+    testConnection()
+  }, [])
+
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
     setMessage(null) // Clear messages on input change
@@ -42,21 +59,31 @@ export function AuthForm({ mode = 'signin', redirectTo = '/app' }: AuthFormProps
     setMessage(null)
 
     try {
+      // Debug logging
+      console.log('Attempting sign in with:', {
+        email: formData.email,
+        supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
+        hasAnonKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+      })
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email: formData.email,
         password: formData.password,
       })
 
       if (error) {
+        console.error('Supabase auth error:', error)
         setMessage({ type: 'error', text: error.message })
         return
       }
 
       if (data.user) {
+        console.log('Sign in successful:', data.user.email)
         router.push(redirectTo)
         router.refresh()
       }
     } catch (error) {
+      console.error('Unexpected auth error:', error)
       setMessage({ type: 'error', text: 'An unexpected error occurred' })
     } finally {
       setLoading(false)
