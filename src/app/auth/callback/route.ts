@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
   const redirectTo = searchParams.get('redirect_to') || '/app'
   
   if (code) {
-    const supabase = createRouteHandlerSupabaseClient()
+    const supabase = await createRouteHandlerSupabaseClient()
     
     try {
       const { error } = await supabase.auth.exchangeCodeForSession(code)
