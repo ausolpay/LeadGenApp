@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -23,6 +23,7 @@ export default function SetupPage() {
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [validationStatus, setValidationStatus] = useState<'none' | 'valid' | 'invalid'>('none')
   const [isAutoPopulating, setIsAutoPopulating] = useState(false) // Flag to prevent clearing during auto-population
+  const autoPopulationCompleted = useRef(false) // Track if auto-population has been completed successfully
   
   const { setLocation } = useLocationStore()
   const router = useRouter()
@@ -55,6 +56,12 @@ export default function SetupPage() {
 
   // Auto-detect location on component mount (once per session)
   useEffect(() => {
+    // Prevent multiple runs if auto-population has already been completed
+    if (autoPopulationCompleted.current) {
+      console.log('Auto-population already completed, skipping duplicate run')
+      return
+    }
+
     const SESSION_KEY = 'location-detection-result'
     const DETECTION_ATTEMPTED_KEY = 'location-detection-attempted'
     
@@ -74,6 +81,7 @@ export default function SetupPage() {
           console.log('Setting cached city:', cached.data.city || '')
           
           // Set auto-populating flag to prevent handlers from clearing fields
+          console.log('🔄 CACHED: Starting auto-population with flag')
           setIsAutoPopulating(true)
           
           setCountryCode(cached.data.countryCode)
@@ -86,7 +94,8 @@ export default function SetupPage() {
           // Clear the flag after a short delay to allow all state updates to complete
           setTimeout(() => {
             setIsAutoPopulating(false)
-            console.log('Auto-population complete - handlers will now work normally')
+            autoPopulationCompleted.current = true // Mark as completed
+            console.log('🔄 CACHED: Auto-population complete - handlers will now work normally')
           }, 100)
         } else {
           // Use cached failure result
@@ -189,6 +198,7 @@ export default function SetupPage() {
           // Clear the flag after a short delay to allow all state updates to complete
           setTimeout(() => {
             setIsAutoPopulating(false)
+            autoPopulationCompleted.current = true // Mark as completed
             console.log('Auto-population complete - handlers will now work normally')
           }, 100)
           
@@ -299,7 +309,7 @@ export default function SetupPage() {
   }, [city, selectedRegion, selectedCountry])
 
   const handleCountryChange = (value: string) => {
-    console.log('handleCountryChange called with:', value, 'isAutoPopulating:', isAutoPopulating)
+    console.log('🎛️ handleCountryChange called with:', JSON.stringify(value), 'length:', value?.length, 'isAutoPopulating:', isAutoPopulating, 'autoCompleted:', autoPopulationCompleted.current)
     setCountryCode(value)
     
     // Only reset other fields if this is a manual user change, not auto-population
@@ -313,7 +323,7 @@ export default function SetupPage() {
   }
 
   const handleRegionChange = (value: string) => {
-    console.log('handleRegionChange called with:', value, 'isAutoPopulating:', isAutoPopulating)
+    console.log('🎛️ handleRegionChange called with:', JSON.stringify(value), 'length:', value?.length, 'isAutoPopulating:', isAutoPopulating, 'autoCompleted:', autoPopulationCompleted.current)
     setRegionCode(value)
     
     // Only reset city if this is a manual user change, not auto-population
