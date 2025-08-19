@@ -729,13 +729,8 @@
 
         // Modal Functions
         function openLoginModal() {
-            const modal = document.getElementById('loginModal');
-            const content = document.getElementById('loginModalContent');
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                content.classList.remove('scale-95', 'opacity-0');
-                content.classList.add('scale-100', 'opacity-100');
-            }, 10);
+            // Redirect directly to auth page with login tab
+            window.location.href = '/auth';
         }
 
         function closeLoginModal() {
@@ -749,13 +744,8 @@
         }
 
         function openSignupModal() {
-            const modal = document.getElementById('signupModal');
-            const content = document.getElementById('signupModalContent');
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                content.classList.remove('scale-95', 'opacity-0');
-                content.classList.add('scale-100', 'opacity-100');
-            }, 10);
+            // Redirect directly to auth page with signup tab
+            window.location.href = '/auth?mode=signup';
         }
 
         function closeSignupModal() {

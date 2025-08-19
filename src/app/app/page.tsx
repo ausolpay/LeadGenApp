@@ -22,8 +22,8 @@ export default function AppPage() {
   const [isClient, setIsClient] = useState(false)
   const [user, setUser] = useState<any>(null)
   const { results, allResults, isLoading } = useResultsStore()
-  const { contactedMap } = useContactedStore()
-  const contactedBusinesses = useMemo(() => Array.from(contactedMap.values()), [contactedMap])
+  const { getContactedBusinesses, setUserId } = useContactedStore()
+  const contactedBusinesses = useMemo(() => getContactedBusinesses(), [getContactedBusinesses])
   const { city, region, country } = useLocationStore()
   const router = useRouter()
   const supabase = createClientSupabaseClient()
@@ -31,6 +31,8 @@ export default function AppPage() {
   // Fix hydration error by ensuring client-side rendering
   useEffect(() => {
     setIsClient(true)
+    // Set document title to match landing page
+    document.title = 'LumaLead.io - Find Business Prospects Effortlessly'
   }, [])
 
   // Get user session
@@ -39,12 +41,13 @@ export default function AppPage() {
       const { data: { session } } = await supabase.auth.getSession()
       if (session?.user) {
         setUser(session.user)
+        setUserId(session.user.id) // Set user ID for contacted store
       } else {
         router.push('/auth')
       }
     }
     getUser()
-  }, [router, supabase.auth])
+  }, [router, supabase.auth, setUserId])
 
   // Redirect to setup if no location is configured
   useEffect(() => {
@@ -74,8 +77,13 @@ export default function AppPage() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             {/* Logo */}
-            <div className="flex items-center space-x-2">
-              <h1 className="text-2xl font-bold" style={{color: '#1a597c'}}>LumaLead.io</h1>
+            <div className="flex items-center space-x-2 cursor-pointer" onClick={() => window.location.href = 'https://www.lumalead.io/'}>
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{backgroundColor: '#1a597c'}}>
+                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                </svg>
+              </div>
+              <span className="text-2xl font-bold" style={{color: '#1a597c'}}>LumaLead.io</span>
             </div>
 
             <div className="flex-1"></div>

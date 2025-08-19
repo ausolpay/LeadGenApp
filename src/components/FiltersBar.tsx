@@ -184,7 +184,7 @@ export function FiltersBar() {
                      }
                    />
                   <label htmlFor="hasMobile" className="text-sm">
-                    Has mobile (04...)
+                    Has mobile phone
                   </label>
                 </div>
                 <div className="flex items-center space-x-2">
@@ -196,7 +196,7 @@ export function FiltersBar() {
                      }
                    />
                   <label htmlFor="hasOffice" className="text-sm">
-                    Has office (07...)
+                    Has office phone
                   </label>
                 </div>
               </div>

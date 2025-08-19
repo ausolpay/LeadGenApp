@@ -1,0 +1,3 @@
+[33me505ac5[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m debug: add logging to auth form to diagnose 400 error
+[33m59a0a86[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m fix: add Content Security Policy headers to fix Supabase auth issues
+[33m54333cb[m fix: landing page redirect for production custom domain

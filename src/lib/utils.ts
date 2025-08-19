@@ -121,26 +121,33 @@ export function formatPhoneNumber(phoneRaw?: string): string | undefined {
 export function hasMobilePhone(phoneFormatted?: string): boolean {
   if (!phoneFormatted) return false
   
-  // Remove spaces and normalize
-  const phone = phoneFormatted.replace(/\s/g, '')
-  
-  // Check for mobile patterns: 04, +61 4, (+61) 4, +614, (+61)4
-  return phone.startsWith('04') || 
-         phone.startsWith('+614') || 
-         phone.startsWith('(+61)4') ||
-         phone.startsWith('+61 4') ||
-         phone.startsWith('(+61) 4')
+  try {
+    const parsed = parsePhoneNumber(phoneFormatted)
+    return parsed?.getType() === 'MOBILE'
+  } catch {
+    // Fallback to pattern matching for common formats
+    const phone = phoneFormatted.replace(/\s/g, '')
+    
+    // Check for mobile patterns from various countries
+    return /^(\+?1[0-9]{10}|04[0-9]{8}|\+614[0-9]{8}|\(\+61\)4[0-9]{8}|\+61\s4[0-9]{8}|\(\+61\)\s4[0-9]{8}|\+44[0-9]{10}|\+1[0-9]{10})/.test(phone)
+  }
 }
 
 export function hasOfficePhone(phoneFormatted?: string): boolean {
   if (!phoneFormatted) return false
   
-  // Remove spaces and normalize  
-  const phone = phoneFormatted.replace(/\s/g, '')
-  
-  // Check for QLD office patterns: 07, (07)
-  return phone.startsWith('07') || 
-         phone.startsWith('(07)')
+  try {
+    const parsed = parsePhoneNumber(phoneFormatted)
+    const type = parsed?.getType()
+    return type === 'FIXED_LINE' || type === 'FIXED_LINE_OR_MOBILE'
+  } catch {
+    // Fallback to pattern matching for landline formats
+    const phone = phoneFormatted.replace(/\s/g, '')
+    
+    // Check for landline patterns from various countries
+    return /^(\+?[1-9][0-9]{7,14}|0[1-9][0-9]{7,8}|\([0-9]{2,3}\)[0-9]{7,8})/.test(phone) && 
+           !hasMobilePhone(phoneFormatted) // Exclude if it's already detected as mobile
+  }
 }
 
 export function extractSuburbFromAddress(address: string): string | undefined {
