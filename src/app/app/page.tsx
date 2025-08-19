@@ -22,7 +22,7 @@ export default function AppPage() {
   const [isClient, setIsClient] = useState(false)
   const [user, setUser] = useState<any>(null)
   const { results, allResults, isLoading } = useResultsStore()
-  const { getContactedBusinesses, setUserId } = useContactedStore()
+  const { getContactedBusinesses, setUserId, isLoading: contactedLoading } = useContactedStore()
   const contactedBusinesses = useMemo(() => getContactedBusinesses(), [getContactedBusinesses])
   const { city, region, country } = useLocationStore()
   const router = useRouter()
@@ -41,7 +41,7 @@ export default function AppPage() {
       const { data: { session } } = await supabase.auth.getSession()
       if (session?.user) {
         setUser(session.user)
-        setUserId(session.user.id) // Set user ID for contacted store
+        await setUserId(session.user.id) // Set user ID for contacted store (now async)
       } else {
         router.push('/auth')
       }

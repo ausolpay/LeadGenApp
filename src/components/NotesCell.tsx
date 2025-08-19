@@ -32,11 +32,15 @@ export function NotesCell({ business, isContacted = false }: NotesCellProps) {
     }
   }, [business.notes, isEditing])
 
-  const saveNotes = useCallback((newNotes: string) => {
-    if (isContacted) {
-      updateContactedNotes(business.placeId, newNotes)
-    } else {
-      updateBusinessNotes(business.placeId, newNotes)
+  const saveNotes = useCallback(async (newNotes: string) => {
+    try {
+      if (isContacted) {
+        await updateContactedNotes(business.placeId, newNotes)
+      } else {
+        updateBusinessNotes(business.placeId, newNotes)
+      }
+    } catch (error) {
+      console.error('Error saving notes:', error)
     }
   }, [isContacted, business.placeId, updateContactedNotes, updateBusinessNotes])
 
@@ -49,8 +53,8 @@ export function NotesCell({ business, isContacted = false }: NotesCellProps) {
     }
     
     // Set new timeout for debounced save
-    timeoutRef.current = setTimeout(() => {
-      saveNotes(value)
+    timeoutRef.current = setTimeout(async () => {
+      await saveNotes(value)
     }, 500)
   }, [saveNotes])
 
@@ -69,12 +73,12 @@ export function NotesCell({ business, isContacted = false }: NotesCellProps) {
         key={`notes-${business.placeId}-editing`} // Stable key to prevent remounting
         value={notes}
         onChange={(e) => handleNotesChange(e.target.value)}
-        onBlur={() => {
+        onBlur={async () => {
           setIsEditing(false)
           // Save any pending changes when losing focus
           if (timeoutRef.current) {
             clearTimeout(timeoutRef.current)
-            saveNotes(notes)
+            await saveNotes(notes)
           }
         }}
         onKeyDown={(e) => {
@@ -87,7 +91,7 @@ export function NotesCell({ business, isContacted = false }: NotesCellProps) {
             // Save immediately on Ctrl+Enter
             if (timeoutRef.current) {
               clearTimeout(timeoutRef.current)
-              saveNotes(notes)
+              saveNotes(notes) // Don't await here to avoid blocking the UI
             }
           }
         }}

@@ -18,7 +18,7 @@ export function ContactCheckboxes({ business }: ContactCheckboxesProps) {
   const contacted = isContacted(business.placeId)
   const currentContact = business.contact || { called: false, emailed: false }
 
-  const handleContactChange = (type: 'called' | 'emailed', checked: boolean) => {
+  const handleContactChange = async (type: 'called' | 'emailed', checked: boolean) => {
     const newContact: ContactState = {
       ...currentContact,
       [type]: checked,
@@ -39,11 +39,12 @@ export function ContactCheckboxes({ business }: ContactCheckboxesProps) {
     
     // If either is checked, mark as contacted and add to exclude
     if (newContact.called || newContact.emailed) {
-      // Small delay to allow button to show as pressed before moving
-      setTimeout(() => {
-        markContacted(updatedBusiness, newContact)
+      try {
+        await markContacted(updatedBusiness, newContact)
         addToExclude(business.placeId)
-      }, 100)
+      } catch (error) {
+        console.error('Error marking business as contacted:', error)
+      }
     }
   }
 

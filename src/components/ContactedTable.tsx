@@ -116,7 +116,7 @@ export function ContactedTable() {
     printWindow.print()
   }
 
-  const handleUncontact = (business: Business) => {
+  const handleUncontact = async (business: Business) => {
     if (removingIds.has(business.placeId)) {
       return // Prevent multiple clicks
     }
@@ -124,21 +124,18 @@ export function ContactedTable() {
     // Mark as removing immediately
     setRemovingIds(prev => new Set(prev).add(business.placeId))
     
-    // Simple timeout like ContactCheckboxes
-    setTimeout(() => {
-      try {
-        removeFromExclude(business.placeId)
-        uncontact(business.placeId)
-      } catch (error) {
-        console.error('Error uncontacting business:', error)
-      } finally {
-        setRemovingIds(prev => {
-          const newSet = new Set(prev)
-          newSet.delete(business.placeId)
-          return newSet
-        })
-      }
-    }, 100)
+    try {
+      removeFromExclude(business.placeId)
+      await uncontact(business.placeId)
+    } catch (error) {
+      console.error('Error uncontacting business:', error)
+    } finally {
+      setRemovingIds(prev => {
+        const newSet = new Set(prev)
+        newSet.delete(business.placeId)
+        return newSet
+      })
+    }
   }
 
   const columns: ColumnDef<Business>[] = [
