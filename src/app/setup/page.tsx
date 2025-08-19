@@ -84,10 +84,13 @@ export default function SetupPage() {
           console.log('🔄 CACHED: Starting auto-population with flag')
           setIsAutoPopulating(true)
           
-          setCountryCode(cached.data.countryCode)
-          setRegionCode(cached.data.regionCode || '')
-          setCity(cached.data.city || '')
-          setDetectionStatus(cached.partial ? 'partial' : 'success')
+          // Use setTimeout to ensure Select components are ready
+          setTimeout(() => {
+            setCountryCode(cached.data.countryCode)
+            setRegionCode(cached.data.regionCode || '')
+            setCity(cached.data.city || '')
+            setDetectionStatus(cached.partial ? 'partial' : 'success')
+          }, 50)
           
           console.log('Cached form values should now be set!')
           
@@ -96,7 +99,7 @@ export default function SetupPage() {
             setIsAutoPopulating(false)
             autoPopulationCompleted.current = true // Mark as completed
             console.log('🔄 CACHED: Auto-population complete - handlers will now work normally')
-          }, 100)
+          }, 150)
         } else {
           // Use cached failure result
           // Set auto-populating flag to prevent handlers from clearing fields
@@ -186,12 +189,16 @@ export default function SetupPage() {
           console.log('Setting city:', detected.city || '')
           
           // Set auto-populating flag to prevent handlers from clearing fields
+          console.log('🔄 FRESH-DETECTION: Starting auto-population with flag')
           setIsAutoPopulating(true)
           
-          setCountryCode(detected.countryCode)
-          setRegionCode(regionCode)
-          setCity(detected.city || '') // City might be empty but that's ok
-          setDetectionStatus(detected.city ? 'success' : 'partial')
+          // Use setTimeout to ensure Select components are ready
+          setTimeout(() => {
+            setCountryCode(detected.countryCode)
+            setRegionCode(regionCode)
+            setCity(detected.city || '') // City might be empty but that's ok
+            setDetectionStatus(detected.city ? 'success' : 'partial')
+          }, 50)
           
           console.log('Form values should now be set!')
           
@@ -199,8 +206,8 @@ export default function SetupPage() {
           setTimeout(() => {
             setIsAutoPopulating(false)
             autoPopulationCompleted.current = true // Mark as completed
-            console.log('Auto-population complete - handlers will now work normally')
-          }, 100)
+            console.log('🔄 FRESH-DETECTION: Auto-population complete - handlers will now work normally')
+          }, 150)
           
           // Cache successful result
           sessionStorage.setItem(SESSION_KEY, JSON.stringify({
@@ -578,9 +585,21 @@ export default function SetupPage() {
                 <Globe className="w-4 h-4 inline mr-2" />
                 Country
               </Label>
-              <Select value={countryCode} onValueChange={handleCountryChange}>
+              <Select 
+                value={countryCode} 
+                onValueChange={(value) => {
+                  console.log('🔧 Select countryCode onValueChange triggered with:', JSON.stringify(value))
+                  // Don't call handler if auto-populating and value is empty (Select component resets)
+                  if (isAutoPopulating && (!value || value === '')) {
+                    console.log('🚫 Ignoring empty value during auto-population')
+                    return
+                  }
+                  handleCountryChange(value)
+                }}
+                disabled={isAutoPopulating}
+              >
                 <SelectTrigger className="border-gray-200 focus:border-[#1a597c]">
-                  <SelectValue placeholder="Select your country" />
+                  <SelectValue placeholder={isAutoPopulating ? "Auto-populating..." : "Select your country"} />
                 </SelectTrigger>
                 <SelectContent>
                   {COUNTRIES.map((country) => (
@@ -600,11 +619,19 @@ export default function SetupPage() {
               </Label>
               <Select 
                 value={regionCode} 
-                onValueChange={handleRegionChange}
-                disabled={!countryCode}
+                onValueChange={(value) => {
+                  console.log('🔧 Select regionCode onValueChange triggered with:', JSON.stringify(value))
+                  // Don't call handler if auto-populating and value is empty (Select component resets)
+                  if (isAutoPopulating && (!value || value === '')) {
+                    console.log('🚫 Ignoring empty value during auto-population')
+                    return
+                  }
+                  handleRegionChange(value)
+                }}
+                disabled={!countryCode || isAutoPopulating}
               >
                 <SelectTrigger className="border-gray-200 focus:border-[#1a597c]">
-                  <SelectValue placeholder={`Select ${selectedCountry?.regionLabel?.toLowerCase() || 'region'}`} />
+                  <SelectValue placeholder={isAutoPopulating ? "Auto-populating..." : `Select ${selectedCountry?.regionLabel?.toLowerCase() || 'region'}`} />
                 </SelectTrigger>
                 <SelectContent>
                   {availableRegions.map((region) => (
