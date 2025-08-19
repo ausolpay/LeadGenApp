@@ -12,6 +12,7 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 ### Google Maps (Required)
 ```
 GOOGLE_MAPS_API_KEY=your-google-maps-api-key
+NEXT_PUBLIC_DEFAULT_REGION=Cairns, QLD
 ```
 
 ### Stripe (Switch to LIVE keys for production)
