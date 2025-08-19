@@ -14,7 +14,7 @@ interface LocationState {
 
 export const useLocationStore = create<LocationState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       country: '',
       region: '',
       city: '',

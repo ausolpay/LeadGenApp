@@ -12,7 +12,16 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 ### Google Maps (Required)
 ```
 GOOGLE_MAPS_API_KEY=your-google-maps-api-key
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your-google-maps-api-key (for client-side geocoding)
 NEXT_PUBLIC_DEFAULT_REGION=Cairns, QLD
+```
+
+### Location Detection APIs (Optional)
+```
+# These APIs are used for auto-location detection
+# IP-based location detection uses ipapi.co (free tier, no key required)
+# GPS location uses browser geolocation API (no key required)
+# Google Geocoding API is used for validation (covered by Google Maps key above)
 ```
 
 ### Stripe (Switch to LIVE keys for production)
