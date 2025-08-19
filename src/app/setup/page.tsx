@@ -26,6 +26,23 @@ export default function SetupPage() {
   const { setLocation } = useLocationStore()
   const router = useRouter()
 
+  // Debug state changes
+  useEffect(() => {
+    console.log('CountryCode state changed to:', countryCode)
+  }, [countryCode])
+
+  useEffect(() => {
+    console.log('RegionCode state changed to:', regionCode)
+  }, [regionCode])
+
+  useEffect(() => {
+    console.log('City state changed to:', city)
+  }, [city])
+
+  useEffect(() => {
+    console.log('Detection status changed to:', detectionStatus)
+  }, [detectionStatus])
+
   // Get current country and region objects
   const selectedCountry = getCountryByCode(countryCode)
   const availableRegions = selectedCountry ? selectedCountry.regions : []
@@ -46,10 +63,17 @@ export default function SetupPage() {
         const cached = JSON.parse(cachedResult)
         
         if (cached.success && cached.data) {
+          console.log('Using cached data:', cached.data)
+          console.log('Setting cached countryCode:', cached.data.countryCode)
+          console.log('Setting cached regionCode:', cached.data.regionCode || '')
+          console.log('Setting cached city:', cached.data.city || '')
+          
           setCountryCode(cached.data.countryCode)
           setRegionCode(cached.data.regionCode || '')
           setCity(cached.data.city || '')
           setDetectionStatus(cached.partial ? 'partial' : 'success')
+          
+          console.log('Cached form values should now be set!')
         } else {
           // Use cached failure result
           setCountryCode(cached.fallbackCountry || 'AU')
@@ -82,26 +106,48 @@ export default function SetupPage() {
         
         if (detected && detected.country && detected.countryCode) {
           console.log('Location detection successful:', detected)
+          console.log('Setting form values...')
           
           // Find matching region
           const country = getCountryByCode(detected.countryCode)
           let regionCode = ''
           
-          if (country) {
+          console.log('Found country data:', country)
+          console.log('Looking for region:', detected.region, 'or code:', detected.regionCode)
+          
+          if (country && detected.region) {
             const region = country.regions.find(r => 
               r.name.toLowerCase() === detected.region.toLowerCase() ||
-              r.code.toLowerCase() === detected.regionCode.toLowerCase()
+              (detected.regionCode && r.code.toLowerCase() === detected.regionCode.toLowerCase())
             )
             if (region) {
               regionCode = region.code
+              console.log('Found matching region:', region)
+            } else {
+              console.log('No matching region found, available regions:', country.regions)
+              // Try partial matching
+              const partialMatch = country.regions.find(r => 
+                r.name.toLowerCase().includes(detected.region.toLowerCase()) ||
+                detected.region.toLowerCase().includes(r.name.toLowerCase())
+              )
+              if (partialMatch) {
+                regionCode = partialMatch.code
+                console.log('Found partial region match:', partialMatch)
+              }
             }
           }
           
           // Set detected values
+          console.log('Setting countryCode:', detected.countryCode)
+          console.log('Setting regionCode:', regionCode)
+          console.log('Setting city:', detected.city || '')
+          
           setCountryCode(detected.countryCode)
           setRegionCode(regionCode)
           setCity(detected.city || '') // City might be empty but that's ok
           setDetectionStatus(detected.city ? 'success' : 'partial')
+          
+          console.log('Form values should now be set!')
           
           // Cache successful result
           sessionStorage.setItem(SESSION_KEY, JSON.stringify({
